@@ -1,6 +1,5 @@
 import qtm_rt
-
-from src.csv_objects.csv_object import CSVWriter
+from drumpy.trajectory_file import TrajectoryFile
 
 
 class QTMWriter:
@@ -13,7 +12,7 @@ class QTMWriter:
         :param path:
         :param time_per_frame: Time in ms per frame
         """
-        self.csv_writer = CSVWriter(path)
+        self.csv_writer = TrajectoryFile(path)
         self.time_per_frame = time_per_frame
 
     def on_packet(self, packet: qtm_rt.QRTPacket):
