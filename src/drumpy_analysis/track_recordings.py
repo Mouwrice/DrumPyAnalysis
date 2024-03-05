@@ -1,8 +1,8 @@
 from multiprocessing import Pool
 
-from app.main import App
-from app.video_source import Source
-from tracker.mediapipe_pose import LandmarkerModel
+from drumpy.app.main import App
+from drumpy.app.video_source import Source
+from drumpy.landmarkermodel import LandmarkerModel
 
 """
 File to track the recordings

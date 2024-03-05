@@ -2,8 +2,8 @@ from bokeh.io import output_file, save, show
 from bokeh.plotting import figure
 from matplotlib import pyplot as plt
 
-from measure.csv_utils.csv_row import CSVRow
-from measure.frame import Frame
+from drumpy_analysis.csv_utils.csv_row import CSVRow
+from drumpy_analysis.csv_utils.frame import Frame
 
 
 def plot_axis(

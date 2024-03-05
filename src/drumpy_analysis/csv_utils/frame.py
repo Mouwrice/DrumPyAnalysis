@@ -1,6 +1,6 @@
 import csv
 
-from measure.csv_utils.csv_row import CSVRow
+from drumpy_analysis.csv_utils.csv_row import CSVRow
 
 
 class Frame:

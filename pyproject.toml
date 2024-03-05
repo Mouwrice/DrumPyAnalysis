@@ -20,6 +20,7 @@ termcolor = "^2.4.0"
 pygame-gui = "^0.6.9"
 scikit-image = "^0.22.0"
 bokeh = "^3.3.4"
+drumpy = {path = "DrumPy"}
 
 
 [tool.poetry.group.dev.dependencies]

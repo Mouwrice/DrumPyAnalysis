@@ -1,11 +1,11 @@
 import os
 
-from measure.csv_utils.csv_comparison import (
+from drumpy_analysis.csv_utils.csv_comparison import (
     get_closest_frame_index,
     row_deviations_boxplot,
     plot_marker_trajectories,
 )
-from measure.frame import Frame
+from drumpy_analysis.csv_utils.frame import Frame
 
 
 def plot_files(
