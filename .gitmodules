@@ -1,0 +1,3 @@
+[submodule "DrumPy"]
+	path = DrumPy
+	url = git@github.com:Mouwrice/DrumPy.git
