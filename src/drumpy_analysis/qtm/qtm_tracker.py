@@ -1,7 +1,6 @@
 import asyncio
 import time
 
-import pygame
 import qtm_rt
 from drumpy.drum.drum import Drum, DrumPresets
 from drumpy.drum.foot import Foot
@@ -95,9 +94,6 @@ async def main():
 
 
 if __name__ == "__main__":
-    pygame.init()
-    pygame.mixer.set_num_channels(64)
-
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     loop.create_task(main())
