@@ -18,5 +18,5 @@ matplotlib = "3.8.3"
 
 
 [tool.poetry.group.dev.dependencies]
-pre-commit = "3.6.1"
+pre-commit = "3.6.2"
 deptry = "0.12.0"
