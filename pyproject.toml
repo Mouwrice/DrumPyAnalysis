@@ -3,7 +3,7 @@ name = "drumpy-analysis"
 version = "0.1.0"
 description = ""
 authors = ["Maurice Van Wassenhove <mauricevanwassenhove@fastmail.com>"]
-packages = [{ include = "drumpy_analysis", from = "src" }]
+packages = [{ include = "drumpy_analysis" }]
 
 [build-system]
 requires = ["poetry-core"]
