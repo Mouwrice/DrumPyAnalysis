@@ -15,6 +15,7 @@ qtm-rt = "3.0.1"
 bokeh = "3.3.4"
 drumpy = {path = "DrumPy"}
 matplotlib = "3.8.3"
+scipy = "^1.12.0"
 
 
 [tool.poetry.group.dev.dependencies]

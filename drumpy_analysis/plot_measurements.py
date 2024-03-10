@@ -1,18 +1,56 @@
-from bokeh.io import output_file, show, save
-from bokeh.plotting import figure
+from copy import deepcopy
 
-from drumpy_analysis.csv_utils.frame import Frame
-from measurement import Measurement
+from scipy.spatial.transform import Rotation
+
+from drumpy_analysis.measurement.frame import Frame, frames_from_csv
+from graphs.deviations_boxplot import deviations_boxplot
+from graphs.trajectory_lineplot import plot_trajectories
+from measurement.measurement import Measurement
 
 
-def get_closest_frame_index(frames: list[Frame], frame: int) -> int:
+def get_closest_frame_index(frames: list[Frame], frame_number: int) -> int:
     """
     Get the index of the frame with the closest frame number
     :param frames:
-    :param frame:
+    :param frame_number:
     :return:
     """
-    return min(range(len(frames)), key=lambda i: abs(frames[i].frame - frame))
+    return min(range(len(frames)), key=lambda i: abs(frames[i].frame - frame_number))
+
+
+def remove_average_offset(
+    base_data: list[Frame], diff_data: list[Frame], mapping: dict[int, int]
+):
+    """
+    Remove the average offset of the diff data compared to the base data.
+    Per axis.
+    """
+    assert len(base_data) == len(diff_data), "Data length does not match"
+
+    for base_marker, diff_marker in mapping.items():
+        avg_offset_x = 0
+        avg_offset_y = 0
+        avg_offset_z = 0
+        for base_frame, diff_frame in zip(base_data, diff_data):
+            avg_offset_x += (
+                diff_frame.rows[diff_marker].x - base_frame.rows[base_marker].x
+            )
+            avg_offset_y += (
+                diff_frame.rows[diff_marker].y - base_frame.rows[base_marker].y
+            )
+            avg_offset_z += (
+                diff_frame.rows[diff_marker].z - base_frame.rows[base_marker].z
+            )
+
+        avg_offset_x /= len(base_data)
+        avg_offset_y /= len(base_data)
+        avg_offset_z /= len(base_data)
+        print("Average offsets", avg_offset_x, avg_offset_y, avg_offset_z)
+        # Apply the offset
+        for diff_frame in diff_data:
+            diff_frame.rows[diff_marker].x -= avg_offset_x
+            diff_frame.rows[diff_marker].y -= avg_offset_y
+            diff_frame.rows[diff_marker].z -= avg_offset_z
 
 
 def arrange_measurement_data(
@@ -51,9 +89,11 @@ def arrange_measurement_data(
         if base_time < diff_time:
             base_idx += 1
             base_frame = base_next_frame
+            diff_frame = deepcopy(diff_frame)
         elif base_time > diff_time:
             diff_idx += 1
             diff_frame = diff_next_frame
+            base_frame = deepcopy(base_frame)
         else:
             base_idx += 1
             diff_idx += 1
@@ -70,157 +110,40 @@ def arrange_measurement_data(
     return base_arranged, diff_arranged
 
 
-def apply_offset_scale_rotation(
-    frames: list[Frame], offset: float, scale: float, rotation: float
-):
+def apply_offset_scale_rotation(frames: list[Frame], measurement: Measurement):
     """
     Apply offset, scale and rotation to the frames
     """
+    rotation = Rotation.from_euler("z", measurement.axis_rotation, degrees=True)
+
     for frame in frames:
         for row in frame.rows:
-            row.x = (row.x + offset) * scale
-            row.y = (row.y + offset) * scale
-            row.z = (row.z + offset) * scale
+            # First apply the reordering
+            if measurement.axis_reorder:
+                row.x, row.y, row.z = row.z, row.x, row.y
 
-    if rotation != 0:
-        raise NotImplementedError("Rotation not implemented yet")
+            # Apply the scale
+            row.x *= measurement.axis_scale[0]
+            row.y *= measurement.axis_scale[1]
+            row.z *= measurement.axis_scale[2]
 
+            # Apply the offset
+            row.x += measurement.axis_offset[0]
+            row.y += measurement.axis_offset[1]
+            row.z += measurement.axis_offset[2]
 
-def plot_axis(
-    axis1: list[float],
-    axis2: list[float],
-    axis: str,
-    marker1: int,
-    marker2: int,
-    file_prefix: str,
-    title_prefix: str,
-    label1: str,
-    label2: str,
-    show_plot: bool = False,
-):
-    """
-    Plot the positions of the markers over time for a certain axis.
-    Normalizes the values between 0 and 1
-    :return:
-    """
-
-    # Remove the average offset from the data
-    avg_offset = 0
-    for i in range(len(axis1)):
-        avg_offset += axis2[i] - axis1[i]
-    avg_offset /= len(axis1)
-
-    for i in range(len(axis1)):
-        axis2[i] -= avg_offset
-
-    title = f"{title_prefix}_{marker1}_{marker2}_{axis}_positions"
-
-    plot = figure(
-        title=title,
-        x_axis_label="Frame",
-        y_axis_label="Position",
-        sizing_mode="stretch_both",
-    )
-    plot.line(list(range(len(axis1))), axis1, legend_label=label1, line_color="red")
-    plot.line(list(range(len(axis2))), axis2, legend_label=label2, line_color="blue")
-
-    output_file(f"{file_prefix}{title}.html")
-    if show_plot:
-        show(plot)
-    else:
-        save(plot)
-
-
-def plot_marker_trajectory(
-    base: list[Frame],
-    diff: list[Frame],
-    measurement: Measurement,
-    base_marker: int,
-    diff_marker: int,
-):
-    """
-    Plot the trajectory of a marker over time using bokeh
-    """
-    base_x = []
-    base_y = []
-    base_z = []
-    diff_x = []
-    diff_y = []
-    diff_z = []
-
-    for base_frame, diff_frame in zip(base, diff):
-        base_row = base_frame.rows[base_marker]
-        diff_row = diff_frame.rows[diff_marker]
-        base_x.append(base_row.x)
-        base_y.append(base_row.y)
-        base_z.append(base_row.z)
-        diff_x.append(diff_row.x)
-        diff_y.append(diff_row.y)
-        diff_z.append(diff_row.z)
-
-    plot_axis(
-        base_x,
-        diff_x,
-        "x",
-        base_marker,
-        diff_marker,
-        measurement.output_prefxix,
-        measurement.plot_prefix,
-        measurement.base_label,
-        measurement.diff_label,
-    )
-
-    plot_axis(
-        base_y,
-        diff_y,
-        "y",
-        base_marker,
-        diff_marker,
-        measurement.output_prefxix,
-        measurement.plot_prefix,
-        measurement.base_label,
-        measurement.diff_label,
-    )
-
-    plot_axis(
-        base_z,
-        diff_z,
-        "z",
-        base_marker,
-        diff_marker,
-        measurement.output_prefxix,
-        measurement.plot_prefix,
-        measurement.base_label,
-        measurement.diff_label,
-    )
-
-
-def plot_trajectories(
-    base: list[Frame],
-    diff: list[Frame],
-    measurement: Measurement,
-    mapping: dict[int, int],
-):
-    """
-    Plot the trajectories of the base and diff data
-    Plots the x, y and z coordinates of the markers over time using bokeh
-    :param base: The base data
-    :param diff: The diff data
-    :param measurement: The measurement object
-    :param mapping: Used to map the markers from the base to the diff data
-    """
-    for key, value in mapping.items():
-        plot_marker_trajectory(base, diff, measurement, key, value)
+            # Then apply the rotation
+            row.x, row.y, row.z = rotation.apply([row.x, row.y, row.z])
 
 
 def plot_measurement(measurement: Measurement):
     """
     Plots the measurement
     """
-    base_data = Frame.frames_from_csv(measurement.base_recording)
-    diff_data = Frame.frames_from_csv(
-        measurement.diff_recording, measurement.unit_conversion
-    )
+    base_data = frames_from_csv(measurement.base_recording)
+    diff_data = frames_from_csv(measurement.diff_recording, measurement.unit_conversion)
+
+    apply_offset_scale_rotation(diff_data, measurement)
 
     base_arranged, diff_arranged = arrange_measurement_data(
         base_data,
@@ -229,14 +152,10 @@ def plot_measurement(measurement: Measurement):
         measurement.diff_frame_offset,
     )
 
-    apply_offset_scale_rotation(
-        diff_arranged,
-        measurement.axis_offset,
-        measurement.axis_scale,
-        measurement.axis_rotation,
-    )
+    remove_average_offset(base_arranged, diff_arranged, measurement.mapping)
 
-    plot_trajectories(base_arranged, diff_arranged, measurement, qtm_to_mediapipe)
+    plot_trajectories(base_arranged, diff_arranged, measurement, show_plot=True)
+    deviations_boxplot(base_arranged, diff_arranged, measurement)
 
 
 qtm_to_mediapipe = {
@@ -253,12 +172,15 @@ measurements = [
         base_recording="data/multicam_asil_01/qtm_multicam_asil_01.csv",
         diff_recording="data/multicam_asil_01/mediapipe_multicam_asil_01_front_LITE_async_video.csv",
         unit_conversion=1000,
-        base_frame_offset=0,
-        diff_frame_offset=0,
+        base_frame_offset=100,
+        diff_frame_offset=100,
         output_prefxix="data/multicam_asil_01/",
-        axis_offset=0,
-        axis_scale=1,
+        # axis_offset=(0, 0, 0),
+        axis_offset=(0, 0, 0),
+        axis_scale=(-0.5, 4, -2),
         axis_rotation=0,
+        axis_reorder=True,
+        mapping={0: 15},
         plot_prefix="multicam_asil_01_front_LITE_async",
         base_label="QTM",
         diff_label="Mediapipe",

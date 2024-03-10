@@ -1,4 +1,4 @@
-class CSVRow:
+class Marker:
     """
     Represents a single row of a CSV file
     """
@@ -26,16 +26,16 @@ class CSVRow:
         self.presence: float | None = presence
         self.normalized: bool = normalized
 
-    @staticmethod
-    def parse_row(row, scale: float = 1.0):
-        frame = int(row["frame"])
-        time = int(row["time"])
-        index = int(row["index"])
-        x = float(row["x"]) * scale
-        y = float(row["y"]) * scale
-        z = float(row["z"]) * scale
-        visibility = row["visibility"]
-        presence = row["presence"]
-        normalized = row["normalized"]
 
-        return CSVRow(frame, time, index, x, y, z, visibility, presence, normalized)
+def parse_row(row, scale: float = 1.0) -> Marker:
+    frame = int(row["frame"])
+    time = int(row["time"])
+    index = int(row["index"])
+    x = float(row["x"]) * scale
+    y = float(row["y"]) * scale
+    z = float(row["z"]) * scale
+    visibility = row["visibility"]
+    presence = row["presence"]
+    normalized = row["normalized"]
+
+    return Marker(frame, time, index, x, y, z, visibility, presence, normalized)

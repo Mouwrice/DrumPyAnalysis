@@ -15,15 +15,21 @@ class Measurement:
     unit_conversion: float
     base_frame_offset: int
     diff_frame_offset: int
-    # Path prefix, used to save the measurements in a specific location with a prefix
-    output_prefxix: str
-    # Offset of the comparison recording
-    axis_offset: float
-    # The scale difference between the two recordings
-    axis_scale: float
+
+    # Offset of the comparison recording, per axis
+    axis_offset: (float, float, float)
+    # The scale difference between the two recordings, per axis
+    axis_scale: (float, float, float)
     # Rotation of the comparison recording
     axis_rotation: float
+    # axis reordering, if true: x -> y, y -> z, z -> x
+    axis_reorder: bool
 
+    # Marker mapping, used to map the markers from the base recording to the comparison recording
+    mapping: dict[int, int]
+
+    # Path prefix, used to save the measurements in a specific location with a prefix
+    output_prefxix: str
     plot_prefix: str
     base_label: str
     diff_label: str
