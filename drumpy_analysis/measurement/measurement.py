@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 
 
 @dataclass
@@ -33,3 +33,6 @@ class Measurement:
     plot_prefix: str
     base_label: str
     diff_label: str
+
+    def to_string(self):
+        return "\n".join([f"{k}: {str(v)}" for k, v in asdict(self).items()])

@@ -12,7 +12,7 @@ and output the results to a csv file
 
 def track_redcordings():
     recordings = [
-        "../recordings/multicam_asil_01_front.mkv",
+        # "../recordings/multicam_asil_01_front.mkv",
         # "../recordings/multicam_asil_01_left.mkv",
         # "../recordings/multicam_asil_01_right.mkv",
         # "../recordings/multicam_asil_02_front.mkv",
@@ -29,7 +29,7 @@ def track_redcordings():
         # "../recordings/multicam_ms_02_right.mkv",
     ]
 
-    models = [LandmarkerModel.LITE, LandmarkerModel.FULL, LandmarkerModel.HEAVY]
+    models = [LandmarkerModel.LITE, LandmarkerModel.FULL]  # , LandmarkerModel.HEAVY]
 
     for recording in recordings:
         for model in models:
@@ -45,7 +45,7 @@ def track_redcordings():
                     file_path=recording,
                     live_stream=True,
                     model=model,
-                    log_file=f"./data/{directory}/mediapipe_{file_name}_{model.name}_async_video.csv",
+                    log_file=f"./data/{directory}/mediapipe_{file_name}_{model.name}.csv",
                 )
                 app.start()
 
