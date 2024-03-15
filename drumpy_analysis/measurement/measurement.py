@@ -5,25 +5,13 @@ from dataclasses import dataclass, asdict
 class Measurement:
     """
     Class to describe a measurement of a tracked recording with another recording
+    Defaults are set to be used when comparing qtm with mediapipe
     """
 
     # The file path of the base recording
     base_recording: str
     # The file path of the comparison recording
     diff_recording: str
-    # Unit conversion factor, 1000 to go from m -> mm
-    unit_conversion: float
-    base_frame_offset: int
-    diff_frame_offset: int
-
-    # Offset of the comparison recording, per axis
-    axis_offset: (float, float, float)
-    # The scale difference between the two recordings, per axis
-    axis_scale: (float, float, float)
-    # Rotation of the comparison recording
-    axis_rotation: float
-    # axis reordering, if true: x -> y, y -> z, z -> x
-    axis_reorder: bool
 
     # Marker mapping, used to map the markers from the base recording to the comparison recording
     mapping: dict[int, int]
@@ -33,6 +21,25 @@ class Measurement:
     plot_prefix: str
     base_label: str
     diff_label: str
+
+    # Unit conversion factor, 1000 to go from m -> mm
+    unit_conversion: float = 1000
+
+    # Offset of the comparison recording, per axis
+    axis_offset: (float, float, float) = (0, 0, 2000)
+
+    # The scale difference between the two recordings, per axis
+    axis_scale: (float, float, float) = (-1, 1, -1)
+
+    # Rotation of the comparison recording
+    axis_rotation: float = 0
+    # axis reordering, if true: x -> y, y -> z, z -> x
+    axis_reorder: bool = True
+
+    # Frame offset, used to align the two recordings
+    # The recording that was started first should have an offset, the second recording should then have an offset of 0
+    base_frame_offset: int | None = 0
+    diff_frame_offset: int | None = None
 
     def to_string(self):
         return "\n".join([f"{k}: {str(v)}" for k, v in asdict(self).items()])
