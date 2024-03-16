@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from scipy.spatial.transform import Rotation
+
 from measurement.frame import Frame
 
 
@@ -20,6 +22,7 @@ def average_absolute_deviation(
     mapping: dict[int, int],
     base_time_offset: int = 0,
     diff_time_offset: int = 0,
+    base_rotation: float = 0,
     scale_diff: tuple[float, float, float] = (1, 1, 1),
     scale_centers_diff: dict[int, tuple[float, float, float]] = (0, 0, 0),
 ) -> Deviation:
@@ -33,6 +36,7 @@ def average_absolute_deviation(
     :param mapping: The mapping between the base and diff data
     :param base_time_offset: The time offset for the base data
     :param diff_time_offset: The time offset for the diff data
+    :param base_rotation: The rotation to apply to the base data around the vertical (z) axis, default is 0
     :param scale_diff: The scale to apply to the diff data, default is (1, 1, 1), (x, y, z)
     :param scale_centers_diff: The center of the scale, values that lie on this point are not changed, other values are scaled
     away from this point. The center is specified for each marker.
@@ -44,6 +48,7 @@ def average_absolute_deviation(
         mapping,
         base_time_offset,
         diff_time_offset,
+        base_rotation,
         scale_diff,
         scale_centers_diff,
     )
@@ -73,6 +78,7 @@ def calculate_deviations(
     mapping: dict[int, int],
     base_time_offset: int = 0,
     diff_time_offset: int = 0,
+    base_rotation: float = 0,
     scale_diff: tuple[float, float, float] = (1, 1, 1),
     scale_centers_diff: dict[int, tuple[float, float, float]] = None,
 ) -> dict[int, Deviation]:
@@ -84,6 +90,7 @@ def calculate_deviations(
     :param mapping: The mapping between the base and diff data
     :param base_time_offset: The time offset for the base data
     :param diff_time_offset: The time offset for the diff data
+    :param base_rotation: The rotation to apply to the base data around the vertical (z) axis, default is 0
     :param scale_diff: The scale to apply to the diff data, default is (1, 1, 1), (x, y, z)
     :param scale_centers_diff: The center of the scale, values that lie on this point are not changed, other values are scaled
     away from this point. The center is specified for each marker.
@@ -97,6 +104,8 @@ def calculate_deviations(
     for key in mapping.keys():
         deviations[key] = Deviation(0, 0, 0, 0, 0, 0, 0)
 
+    rotation = Rotation.from_euler("z", base_rotation, degrees=True)
+
     count = 0
 
     while base_index < len(base) - 1 and diff_index < len(diff) - 1:
@@ -104,6 +113,10 @@ def calculate_deviations(
 
         for base_marker, diff_marker in mapping.items():
             base_row = base_frame.rows[base_marker]
+            base_x, base_y, base_z = rotation.apply(
+                [base_row.x, base_row.y, base_row.z]
+            )
+
             diff_row = diff_frame.rows[diff_marker]
 
             if scale_centers_diff is not None:
@@ -121,9 +134,9 @@ def calculate_deviations(
                 diff_y = diff_row.y
                 diff_z = diff_row.z
 
-            x = base_row.x - diff_x
-            y = base_row.y - diff_y
-            z = base_row.z - diff_z
+            x = base_x - diff_x
+            y = base_y - diff_y
+            z = base_z - diff_z
 
             deviations[base_marker].x += x
             deviations[base_marker].y += y
