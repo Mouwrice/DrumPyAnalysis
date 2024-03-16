@@ -7,13 +7,15 @@ from measurement.find_optimal_offset import (
     find_optimal_diff_offset,
     find_optimal_base_offset,
 )
+from measurement.find_optimal_scale import apply_scale
 from measurement.measurement import Measurement
 
 
-def remove_time_offset(frames: list[Frame], time_offset: int):
+def remove_time_offset(frames: list[Frame]):
     """
     Remove the time offset from the frames
     """
+    time_offset = frames[0].time_ms
     for frame in frames:
         frame.time_ms -= time_offset
 
@@ -31,12 +33,12 @@ def remove_average_offset(
     for key, value in mapping.items():
         print(f"Average deviation for marker {key} and {value}: {deviations[key]}")
         for frame in diff_data:
-            frame.rows[value].x -= deviations[key].x
-            frame.rows[value].y -= deviations[key].y
-            frame.rows[value].z -= deviations[key].z
+            frame.rows[value].x += deviations[key].x
+            frame.rows[value].y += deviations[key].y
+            frame.rows[value].z += deviations[key].z
 
 
-def apply_offset_scale_rotation(frames: list[Frame], measurement: Measurement):
+def apply_axis_transformations(frames: list[Frame], measurement: Measurement):
     """
     Apply offset, scale and rotation to the frames
     """
@@ -48,10 +50,13 @@ def apply_offset_scale_rotation(frames: list[Frame], measurement: Measurement):
             if measurement.axis_reorder:
                 row.x, row.y, row.z = row.z, row.x, row.y
 
-            # Apply the scale
-            row.x *= measurement.axis_scale[0]
-            row.y *= measurement.axis_scale[1]
-            row.z *= measurement.axis_scale[2]
+            # Flip the axis of diff
+            if measurement.flip_axis_diff[0]:
+                row.x *= -1
+            if measurement.flip_axis_diff[1]:
+                row.y *= -1
+            if measurement.flip_axis_diff[2]:
+                row.z *= -1
 
             # Apply the offset
             row.x += measurement.axis_offset[0]
@@ -62,36 +67,26 @@ def apply_offset_scale_rotation(frames: list[Frame], measurement: Measurement):
             row.x, row.y, row.z = rotation.apply([row.x, row.y, row.z])
 
 
-def plot_measurement(measurement: Measurement):
-    """
-    Plots the measurement
-    """
-    base_data = frames_from_csv(measurement.base_recording)
-    diff_data = frames_from_csv(measurement.diff_recording, measurement.unit_conversion)
-
-    apply_offset_scale_rotation(diff_data, measurement)
-
-    # 1. Remove the average offset
-    remove_average_offset(base_data, diff_data, measurement.mapping)
-
+def frame_offsets(
+    base_data: list[Frame],
+    diff_data: list[Frame],
+    measurement: Measurement,
+):
     assert (
         measurement.base_frame_offset is not None
         or measurement.diff_frame_offset is not None
-    ), "Frame offset must be set"
+    ), "Either the base or diff frame offset should be set to align the frames."
 
-    # 2. Apply or find the frame offset
     if measurement.base_frame_offset is None:
         base_offset = find_optimal_base_offset(
             base_data,
             diff_data,
         )
         print(f"Base offset: {base_offset}")
+        measurement.base_frame_offset = base_offset
         base_data = base_data[base_offset:]
-        remove_time_offset(base_data, base_data[0].time_ms)
     else:
         base_data = base_data[measurement.base_frame_offset :]
-        time_offset = base_data[0].time_ms
-        remove_time_offset(diff_data, time_offset)
 
     if measurement.diff_frame_offset is None:
         diff_offset = find_optimal_diff_offset(
@@ -99,16 +94,36 @@ def plot_measurement(measurement: Measurement):
             diff_data,
         )
         print(f"Diff offset: {diff_offset}")
+        measurement.diff_frame_offset = diff_offset
         diff_data = diff_data[diff_offset:]
-        remove_time_offset(diff_data, diff_data[0].time_ms)
 
     else:
         diff_data = diff_data[measurement.diff_frame_offset :]
-        time_offset = diff_data[0].time_ms
-        remove_time_offset(base_data, time_offset)
+
+    remove_time_offset(diff_data)
+    remove_time_offset(base_data)
+
+
+def plot_measurement(measurement: Measurement):
+    """
+    Plots the measurement
+    """
+    base_data = frames_from_csv(measurement.base_recording)
+    diff_data = frames_from_csv(measurement.diff_recording, measurement.unit_conversion)
+
+    apply_axis_transformations(diff_data, measurement)
+
+    # 1. Remove the average offset
+    remove_average_offset(base_data, diff_data, measurement.mapping)
+
+    # 2. Apply or find the frame offset
+    frame_offsets(base_data, diff_data, measurement)
 
     # 3. Remove the average offset again, now that the frames are aligned
     remove_average_offset(base_data, diff_data, measurement.mapping)
+
+    # 4. Find the optimal scale
+    apply_scale(base_data, diff_data, measurement)
 
     plot_trajectories(base_data, diff_data, measurement, show_plot=True)
     # deviations_boxplot(base_data, diff_data, measurement, file=file)
@@ -134,6 +149,7 @@ measurements = [
         diff_recording="data/multicam_asil_01/mediapipe_multicam_asil_01_front_LITE.csv",
         output_prefxix="data/multicam_asil_01/",
         mapping={0: 15},
+        diff_frame_offset=71,
         plot_prefix="mediapipe_multicam_asil_01_front_LITE",
         base_label="QTM",
         diff_label="Mediapipe",

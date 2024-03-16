@@ -26,10 +26,13 @@ class Measurement:
     unit_conversion: float = 1000
 
     # Offset of the comparison recording, per axis
-    axis_offset: (float, float, float) = (0, 0, 2000)
+    axis_offset: (float, float, float) = (0, 0, 0)
 
-    # The scale difference between the two recordings, per axis
-    axis_scale: (float, float, float) = (-1, 1, -1)
+    # Whether diff axis should be flipped or not, per axis, e.g. x -> -x
+    flip_axis_diff: (bool, bool, bool) = (True, False, True)
+
+    # Scale of the comparison recording, stretched or compressed around the center of the values
+    axis_scale: (float, float, float) = None
 
     # Rotation of the comparison recording
     axis_rotation: float = 0

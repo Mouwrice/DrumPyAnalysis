@@ -23,7 +23,7 @@ def find_optimal_base_offset(
             diff_time_offset=diff_data[0].time_ms,
         )
         # The average deviation of the z axis
-        deviation = deviations.get(0).z
+        deviation = deviations.get(0).z_abs
         if deviation < lowest_deviation:
             lowest_deviation = deviation
             print(f"Base offset: {offset}, Average z-axis deviation: {deviation}")
@@ -53,7 +53,7 @@ def find_optimal_diff_offset(
             diff_time_offset=diff_data[offset].time_ms,
         )
         # The average deviation of the z axis
-        deviation = deviations.get(0).z
+        deviation = deviations.get(0).z_abs
         if deviation < lowest_deviation:
             lowest_deviation = deviation
             print(f"Diff offset: {offset}, Average z-axis deviation: {deviation}")
