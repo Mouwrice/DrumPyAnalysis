@@ -117,6 +117,7 @@ def plot_measurement(measurement: Measurement):
     remove_average_offset(base_data, diff_data, measurement.mapping)
 
     # 4. Apply or find the scale and rotation
+    # apply_base_rotation(base_data, diff_data, measurement)
     apply_scale_rotation(base_data, diff_data, measurement)
 
     plot_trajectories(base_data, diff_data, measurement, show_plot=True)
@@ -143,6 +144,7 @@ measurements = [
     #     diff_recording="data/multicam_asil_01/mediapipe_multicam_asil_01_front_LITE.csv",
     #     output_prefxix="data/multicam_asil_01/",
     #     mapping={0: 15},
+    #     diff_frame_offset=81,
     #     plot_prefix="mediapipe_multicam_asil_01_front_LITE",
     # ),
     # Measurement(
@@ -186,20 +188,22 @@ measurements = [
     #     mapping={0: 15},
     #     plot_prefix="mediapipe_multicam_asil_01_front_HEAVY",
     # ),
-    # Measurement(
-    #     base_recording="data/multicam_asil_01/qtm_multicam_asil_01.csv",
-    #     diff_recording="data/multicam_asil_01/mediapipe_multicam_asil_01_left_HEAVY.csv",
-    #     output_prefxix="data/multicam_asil_01/",
-    #     mapping={0: 15},
-    #     plot_prefix="mediapipe_multicam_asil_01_left_HEAVY",
-    # ),
     Measurement(
         base_recording="data/multicam_asil_01/qtm_multicam_asil_01.csv",
-        diff_recording="data/multicam_asil_01/mediapipe_multicam_asil_01_right_HEAVY.csv",
+        diff_recording="data/multicam_asil_01/mediapipe_multicam_asil_01_left_HEAVY.csv",
         output_prefxix="data/multicam_asil_01/",
         mapping={0: 15},
-        plot_prefix="mediapipe_multicam_asil_01_right_HEAVY",
+        diff_frame_offset=119,
+        plot_prefix="mediapipe_multicam_asil_01_left_HEAVY",
     ),
+    # Measurement(
+    #     base_recording="data/multicam_asil_01/qtm_multicam_asil_01.csv",
+    #     diff_recording="data/multicam_asil_01/mediapipe_multicam_asil_01_right_HEAVY.csv",
+    #     output_prefxix="data/multicam_asil_01/",
+    #     mapping={0: 15},
+    #     diff_frame_offset=183,
+    #     plot_prefix="mediapipe_multicam_asil_01_right_HEAVY",
+    # ),
 ]
 
 if __name__ == "__main__":

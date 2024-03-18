@@ -8,7 +8,7 @@ def find_optimal_base_offset(
     max_offset: int = 200,
 ) -> int:
     """
-    Find the optimal frame offset between the two data sets by looking at the average deviation of the z axis
+    Find the optimal frame offset between the two data sets by looking at the average deviation of the z axis.
     :return: The optimal frame offset for the base
     """
     base_offset = 0

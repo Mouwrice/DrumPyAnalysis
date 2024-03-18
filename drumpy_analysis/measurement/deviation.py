@@ -23,8 +23,8 @@ def average_absolute_deviation(
     base_time_offset: int = 0,
     diff_time_offset: int = 0,
     base_rotation: float = 0,
-    scale_diff: tuple[float, float, float] = (1, 1, 1),
-    scale_centers_diff: dict[int, tuple[float, float, float]] = (0, 0, 0),
+    stretch_diff: tuple[float, float, float] = (1, 1, 1),
+    stretch_centers_diff: dict[int, tuple[float, float, float]] = (0, 0, 0),
 ) -> Deviation:
     """
     Calculate the average deviation between the base and diff data.
@@ -37,8 +37,10 @@ def average_absolute_deviation(
     :param base_time_offset: The time offset for the base data
     :param diff_time_offset: The time offset for the diff data
     :param base_rotation: The rotation to apply to the base data around the vertical (z) axis, default is 0
-    :param scale_diff: The scale to apply to the diff data, default is (1, 1, 1), (x, y, z)
-    :param scale_centers_diff: The center of the scale, values that lie on this point are not changed, other values are scaled
+    :param stretch_diff: The stretch to apply to the diff data, default is (1, 1, 1), (x, y, z)
+    :param stretch_centers_diff: The center of the stretct, values that lie on this point are not changed.
+    When the stretch is zero, all points converge to this center.
+    The center is specified for each marker.
     away from this point. The center is specified for each marker.
     """
 
@@ -49,8 +51,8 @@ def average_absolute_deviation(
         base_time_offset,
         diff_time_offset,
         base_rotation,
-        scale_diff,
-        scale_centers_diff,
+        stretch_diff,
+        stretch_centers_diff,
     )
 
     average = Deviation(0, 0, 0, 0, 0, 0, 0)
@@ -79,8 +81,8 @@ def calculate_deviations(
     base_time_offset: int = 0,
     diff_time_offset: int = 0,
     base_rotation: float = 0,
-    scale_diff: tuple[float, float, float] = (1, 1, 1),
-    scale_centers_diff: dict[int, tuple[float, float, float]] = None,
+    stretch_diff: tuple[float, float, float] = (1, 1, 1),
+    stretch_centers_diff: dict[int, tuple[float, float, float]] = None,
 ) -> dict[int, Deviation]:
     """
     Calculate the absolute deviation between the base and diff data
@@ -91,9 +93,10 @@ def calculate_deviations(
     :param base_time_offset: The time offset for the base data
     :param diff_time_offset: The time offset for the diff data
     :param base_rotation: The rotation to apply to the base data around the vertical (z) axis, default is 0
-    :param scale_diff: The scale to apply to the diff data, default is (1, 1, 1), (x, y, z)
-    :param scale_centers_diff: The center of the scale, values that lie on this point are not changed, other values are scaled
-    away from this point. The center is specified for each marker.
+    :param stretch_diff: The stretch to apply to the diff data, default is (1, 1, 1), (x, y, z)
+    :param stretch_centers_diff: The center of the stretct, values that lie on this point are not changed.
+    When the stretch is zero, all points converge to this center.
+    The center is specified for each marker.
     :return: For each marker, a Deviation
     """
     base_index = 0
@@ -119,16 +122,16 @@ def calculate_deviations(
 
             diff_row = diff_frame.rows[diff_marker]
 
-            if scale_centers_diff is not None:
-                diff_x = (diff_row.x - scale_centers_diff[diff_marker][0]) * scale_diff[
-                    0
-                ] + diff_row.x
-                diff_y = (diff_row.y - scale_centers_diff[diff_marker][1]) * scale_diff[
-                    1
-                ] + diff_row.y
-                diff_z = (diff_row.z - scale_centers_diff[diff_marker][2]) * scale_diff[
-                    2
-                ] + diff_row.z
+            if stretch_centers_diff is not None:
+                diff_x = (
+                    diff_row.x - stretch_centers_diff[diff_marker][0]
+                ) * stretch_diff[0] + stretch_centers_diff[diff_marker][0]
+                diff_y = (
+                    diff_row.y - stretch_centers_diff[diff_marker][1]
+                ) * stretch_diff[1] + stretch_centers_diff[diff_marker][1]
+                diff_z = (
+                    diff_row.z - stretch_centers_diff[diff_marker][2]
+                ) * stretch_diff[2] + stretch_centers_diff[diff_marker][2]
             else:
                 diff_x = diff_row.x
                 diff_y = diff_row.y

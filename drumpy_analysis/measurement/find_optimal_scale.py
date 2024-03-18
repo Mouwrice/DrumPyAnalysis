@@ -1,6 +1,40 @@
+import math
+
 from measurement.deviation import average_absolute_deviation
 from measurement.frame import Frame, get_marker_centers
 from measurement.measurement import Measurement
+
+
+class DeviationFunction:
+    """
+    A helper class to calculate the deviation for a given scale
+    """
+
+    def __init__(
+        self,
+        base_data: list[Frame],
+        diff_data: list[Frame],
+        measurement: Measurement,
+        stretch_centers_diff: dict[int, tuple[float, float, float]],
+    ):
+        self.base_data = base_data
+        self.diff_data = diff_data
+        self.measurement = measurement
+        self.stretch_centers_diff = stretch_centers_diff
+
+    def calculate(self, stretch: list[float]) -> tuple[float, float, float]:
+        """
+        Calculate the deviation for the given scale
+        """
+        dev = average_absolute_deviation(
+            self.base_data,
+            self.diff_data,
+            self.measurement.mapping,
+            base_rotation=self.measurement.base_axis_rotation,
+            stretch_diff=(stretch[0], stretch[1], stretch[2]),
+            stretch_centers_diff=self.stretch_centers_diff,
+        )
+        return dev.x_abs, dev.y_abs, dev.z_abs
 
 
 def find_optimal_diff_scale(
@@ -11,88 +45,83 @@ def find_optimal_diff_scale(
 ) -> tuple[float, float, float]:
     """
     Find the optimal scale for the diff (x, y, z) compared to the base.
-    Uses the average deviations and binary search to find the optimal scale.
     Assumes the deviation has a minimum at the optimal scale.
+    Uses Golden-section search to find the optimal scale for each axis.
     :return: The optimal scale found
     """
+    deviator = DeviationFunction(base_data, diff_data, measurement, scale_centers_diff)
 
-    print("\nFinding optimal scale for diff data\n")
+    # The golden ratio gets used to find points to check in Golden-section search
+    golden_ration = (math.sqrt(5) + 1) / 2
+
+    print("\n --- Finding optimal stretch for diff data ---\n")
 
     # The minimum and maximum scale
-    scale_low = [0, 0, 0]
-    scale_middle = [5, 5, 5]
-    scale_high = [10, 10, 10]
+    left_bound: list[float] = [0, 0, 0]
+    right_bound: list[float] = [10, 10, 10]
 
-    print(f"Scale min: {scale_low}")
-    print(f"Scale max: {scale_middle}")
+    print(f"Stretch left_bound: {left_bound}")
+    print(f"Stretch right_bound: {right_bound}")
 
-    dev = average_absolute_deviation(
-        base_data,
-        diff_data,
-        measurement.mapping,
-        scale_diff=(scale_low[0], scale_low[1], scale_low[2]),
-        scale_centers_diff=scale_centers_diff,
-    )
-    low_deviation = [dev.x_abs, dev.y_abs, dev.z_abs]
-    dev = average_absolute_deviation(
-        base_data,
-        diff_data,
-        measurement.mapping,
-        scale_diff=(scale_middle[0], scale_middle[1], scale_middle[2]),
-        scale_centers_diff=scale_centers_diff,
-    )
-    middle_deviation = [dev.x_abs, dev.y_abs, dev.z_abs]
+    dev = deviator.calculate(left_bound)
+    left_bound_deviation = [dev[0], dev[1], dev[2]]
+    dev = deviator.calculate(right_bound)
+    right_bound_deviation = [dev[0], dev[1], dev[2]]
 
-    i = 0
-    # The binary search, stop when the deviation difference is smaller than 0.01
+    print(f"Deviation left_bound: {left_bound_deviation}")
+    print(f"Deviation right_bound: {right_bound_deviation}")
+
+    iteration = 0
+    # Stop when the interval is small enough
     while (
-        abs(middle_deviation[0] - low_deviation[0]) > 0.01
-        or abs(middle_deviation[1] - low_deviation[1]) > 0.01
-        or abs(middle_deviation[2] - low_deviation[2]) > 0.01
+        right_bound[0] - left_bound[0] > 0.01
+        or right_bound[1] - left_bound[1] > 0.01
+        or right_bound[2] - left_bound[2] > 0.01
     ):
-        i += 1
-        print(f"Optimizing scale, iteration {i}")
-        print(f"Scale: {scale_middle}")
-        print(f"Deviation: {middle_deviation}\n")
+        iteration += 1
+        print(f"\nOptimizing scale, iteration {iteration}:\n")
+
+        new_left_bound = [
+            right_bound[0] - (right_bound[0] - left_bound[0]) / golden_ration,
+            right_bound[1] - (right_bound[1] - left_bound[1]) / golden_ration,
+            right_bound[2] - (right_bound[2] - left_bound[2]) / golden_ration,
+        ]
+        dev = deviator.calculate(new_left_bound)
+        new_left_bound_deviation = [dev[0], dev[1], dev[2]]
+
+        new_right_bound = [
+            left_bound[0] + (right_bound[0] - left_bound[0]) / golden_ration,
+            left_bound[1] + (right_bound[1] - left_bound[1]) / golden_ration,
+            left_bound[2] + (right_bound[2] - left_bound[2]) / golden_ration,
+        ]
+        dev = deviator.calculate(new_right_bound)
+        new_right_bound_deviation = [dev[0], dev[1], dev[2]]
 
         # Optimize each axis independently
-        if middle_deviation[0] < low_deviation[0]:
-            scale_low[0] = scale_middle[0]
-            low_deviation[0] = middle_deviation[0]
-        else:
-            scale_high[0] = scale_middle[0]
-        if middle_deviation[1] < low_deviation[1]:
-            scale_low[1] = scale_middle[1]
-            low_deviation[1] = middle_deviation[1]
-        else:
-            scale_high[1] = scale_middle[1]
-        if middle_deviation[2] < low_deviation[2]:
-            scale_low[2] = scale_middle[2]
-            low_deviation[2] = middle_deviation[2]
-        else:
-            scale_high[2] = scale_middle[2]
+        for i in range(3):
+            if new_left_bound_deviation[i] < new_right_bound_deviation[i]:
+                right_bound[i] = new_right_bound[i]
+                right_bound_deviation[i] = new_right_bound_deviation[i]
 
-        scale_middle = [
-            (scale_low[0] + scale_high[0]) / 2,
-            (scale_low[1] + scale_high[1]) / 2,
-            (scale_low[2] + scale_high[2]) / 2,
-        ]
+            else:
+                left_bound[i] = new_left_bound[i]
+                left_bound_deviation[i] = new_left_bound_deviation[i]
 
-        dev = average_absolute_deviation(
-            base_data,
-            diff_data,
-            measurement.mapping,
-            scale_diff=(scale_middle[0], scale_middle[1], scale_middle[2]),
-            scale_centers_diff=scale_centers_diff,
-        )
-        middle_deviation = [dev.x_abs, dev.y_abs, dev.z_abs]
+        print(f"New left_bound: {left_bound}")
+        print(f"New right_bound: {right_bound}")
+        print(f"New left_bound_deviation: {left_bound_deviation}")
+        print(f"New right_bound_deviation: {right_bound_deviation}\n")
 
-    print(f"Optimal scale: {scale_middle}")
-    print(f"Deviation: {middle_deviation}")
-    return scale_middle[0], scale_middle[1], scale_middle[2]
+    middle = [(left_bound[i] + right_bound[i]) / 2 for i in range(3)]
+    dev = deviator.calculate(middle)
+    middle_deviation = [dev[0], dev[1], dev[2]]
+    print(f"Optimal diff stretch: {middle}")
+    print(f"Minimal deviation: {middle_deviation}")
+
+    return middle[0], middle[1], middle[2]
 
 
-def apply_diff_scale(
+def apply_diff_stretch(
     base_data: list[Frame],
     diff_data: list[Frame],
     measurement: Measurement,
@@ -102,15 +131,21 @@ def apply_diff_scale(
     """
     scale_centers_diff = get_marker_centers(diff_data, measurement.mapping)
 
-    if measurement.diff_axis_scale is None:
-        measurement.diff_axis_scale = find_optimal_diff_scale(
+    if measurement.diff_axis_stretch is None:
+        measurement.diff_axis_stretch = find_optimal_diff_scale(
             base_data, diff_data, scale_centers_diff, measurement
         )
 
-    scale = measurement.diff_axis_scale
+    scale = measurement.diff_axis_stretch
     for frame in diff_data:
         for key in scale_centers_diff.keys():
             row = frame.rows[key]
-            row.x += (row.x - scale_centers_diff[key][0]) * scale[0]
-            row.y += (row.y - scale_centers_diff[key][1]) * scale[1]
-            row.z += (row.z - scale_centers_diff[key][2]) * scale[2]
+            row.x = (row.x - scale_centers_diff[key][0]) * scale[
+                0
+            ] + scale_centers_diff[key][0]
+            row.y = (row.y - scale_centers_diff[key][1]) * scale[
+                1
+            ] + scale_centers_diff[key][1]
+            row.z = (row.z - scale_centers_diff[key][2]) * scale[
+                2
+            ] + scale_centers_diff[key][2]

@@ -36,10 +36,10 @@ class Measurement:
     diff_flip_axis: (bool, bool, bool) = (True, False, True)
 
     # Scale of the comparison recording, stretched or compressed around the center of the values
-    diff_axis_scale: (float, float, float) = None
+    diff_axis_stretch: tuple[float, float, float] = None
 
     # Center of the scale, values that lie on this point are not changed, other values are scaled away from this point
-    diff_scale_centers: dict[int, (float, float, float)] = None
+    diff_stretch_centers: dict[int, tuple[float, float, float]] = None
 
     # Frame offset, used to align the two recordings
     # The recording that was started first should have an offset, the second recording should then have an offset of 0

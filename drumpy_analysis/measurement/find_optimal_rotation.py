@@ -1,3 +1,5 @@
+import math
+
 from scipy.spatial.transform import Rotation
 
 from measurement.deviation import average_absolute_deviation
@@ -5,82 +7,102 @@ from measurement.frame import Frame
 from measurement.measurement import Measurement
 
 
+class DeviationFunction:
+    """
+    A helper class to calculate the deviation for a given rotation
+    """
+
+    def __init__(
+        self, base_data: list[Frame], diff_data: list[Frame], measurement: Measurement
+    ):
+        self.base_data = base_data
+        self.diff_data = diff_data
+        self.measurement = measurement
+
+    def calculate(self, rotation: float) -> tuple[float, float]:
+        """
+        Calculate the deviation for the given rotation.
+        We are only interested in the x and y-axis deviation.
+        """
+        dev = average_absolute_deviation(
+            self.base_data,
+            self.diff_data,
+            self.measurement.mapping,
+            base_rotation=rotation,
+            stretch_diff=self.measurement.diff_axis_stretch,
+            stretch_centers_diff=self.measurement.diff_stretch_centers,
+        )
+        return dev.x_abs, dev.y_abs
+
+
 def find_optimal_base_rotation(
     base_data: list[Frame],
     diff_data: list[Frame],
-    scale_centers_diff: dict[int, tuple[float, float, float]],
     measurement: Measurement,
 ) -> float:
     """
     Find the optimal rotation for the base data to align with the diff data.
     Uses the average absolute deviation to find the optimal rotation.
     Assumes the deviation is a local minimum around the optimal rotation.
+    Uses Golden-section search.
     :return: The optimal rotation found
     """
+    deviator = DeviationFunction(base_data, diff_data, measurement)
 
-    print("\n Finding optimal base rotation\n")
+    # The golden ratio gets used to find points to check in Golden-section search
+    golden_ration = (math.sqrt(5) + 1) / 2
+
+    print("\n --- Finding optimal base rotation ---\n")
 
     # The minimum and maximum rotation
-    rotation_low = -180
-    rotation_middle = 0
-    rotation_high = 180
+    left_bound = -180
+    right_bound = 180
 
-    print(f"Rotation min: {rotation_low}")
-    print(f"Rotation max: {rotation_high}")
-
-    dev = average_absolute_deviation(
-        base_data,
-        diff_data,
-        measurement.mapping,
-        base_rotation=rotation_low,
-        scale_diff=measurement.diff_axis_scale,
-        scale_centers_diff=scale_centers_diff,
-    )
+    print(f"Rotation left_bound: {left_bound}")
+    print(f"Rotation right_bound: {right_bound}")
 
     # We know that the z-axis remains the same, so we only need to optimize the x and y-axis
-    low_deviation = [dev.x_abs, dev.y_abs]
-    dev = average_absolute_deviation(
-        base_data,
-        diff_data,
-        measurement.mapping,
-        base_rotation=rotation_middle,
-        scale_diff=measurement.diff_axis_scale,
-        scale_centers_diff=scale_centers_diff,
-    )
-    middle_deviation = [dev.x_abs, dev.y_abs]
+    dev = deviator.calculate(left_bound)
+    left_deviation = [dev[0], dev[1]]
+    dev = deviator.calculate(right_bound)
+    right_deviation = [dev[0], dev[1]]
 
-    i = 0
-    # The binary search, stop when the deviation difference is smaller than 0.01
-    while (
-        abs(middle_deviation[0] - low_deviation[0]) > 0.01
-        or abs(middle_deviation[1] - low_deviation[1]) > 0.01
-    ):
-        i += 1
-        print(f"Optimizing rotation, iteration {i}")
-        print(f"Rotation: {rotation_middle}")
-        print(f"Deviation: {middle_deviation}\n")
+    print(f"Deviation left_bound: {left_deviation}")
+    print(f"Deviation right_bound: {right_deviation}")
 
-        # Optimize each axis independently
-        if sum(middle_deviation) < sum(low_deviation):
-            rotation_low = rotation_middle
-            low_deviation = middle_deviation
+    iteration = 0
+    # Stop when the interval is small enough
+    while right_bound - left_bound > 0.1:
+        iteration += 1
+        print(f"\nOptimizing rotation, iteration {iteration}:\n")
+
+        new_left_bound = right_bound - (right_bound - left_bound) / golden_ration
+        dev = deviator.calculate(new_left_bound)
+        new_left_deviation = [dev[0], dev[1]]
+
+        new_right_bound = left_bound + (right_bound - left_bound) / golden_ration
+        dev = deviator.calculate(new_right_bound)
+        new_right_deviation = [dev[0], dev[1]]
+
+        # If we can lower the deviation for the x or y-axis, we move the bound
+        if new_left_deviation[1] < new_right_deviation[1]:
+            right_bound = new_right_bound
+            right_deviation = new_right_deviation
         else:
-            rotation_high = rotation_middle
+            left_bound = new_left_bound
+            left_deviation = new_left_deviation
 
-        rotation_middle = (rotation_low + rotation_high) / 2
+        print(f"New left_bound: {left_bound}")
+        print(f"New right_bound: {right_bound}")
+        print(f"New deviation left_bound: {left_deviation}")
+        print(f"New deviation right_bound: {right_deviation}\n")
 
-        dev = average_absolute_deviation(
-            base_data,
-            diff_data,
-            measurement.mapping,
-            base_rotation=rotation_middle,
-            scale_diff=measurement.diff_axis_scale,
-            scale_centers_diff=scale_centers_diff,
-        )
-        middle_deviation = (dev.x_abs, dev.y_abs)
+    middle = (left_bound + right_bound) / 2
+    dev = deviator.calculate(middle)
+    print(f"Optimal base rotation: {middle}")
+    print(f"Minimal deviation: {dev}")
 
-    print(f"Optimal rotation: {rotation_middle}")
-    return rotation_middle
+    return middle
 
 
 def apply_base_rotation(
@@ -91,7 +113,7 @@ def apply_base_rotation(
     """
     if measurement.base_axis_rotation is None:
         measurement.base_axis_rotation = find_optimal_base_rotation(
-            base_data, diff_data, measurement.diff_scale_centers, measurement
+            base_data, diff_data, measurement
         )
 
     rotation = Rotation.from_euler("z", measurement.base_axis_rotation, degrees=True)
