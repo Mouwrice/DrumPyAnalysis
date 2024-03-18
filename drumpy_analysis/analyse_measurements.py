@@ -36,23 +36,17 @@ def apply_axis_transformations(frames: list[Frame], measurement: Measurement):
             row.z += measurement.diff_axis_offset[2]
 
 
-def plot_measurement(measurement: Measurement):
-    """
-    Plots the measurement
-    """
+def analyze(measurement: Measurement):
+    print(f"\n\n --- Analyzing {measurement.plot_prefix} --- \n")
     base_data = frames_from_csv(measurement.base_recording)
     diff_data = frames_from_csv(measurement.diff_recording, measurement.unit_conversion)
 
     apply_axis_transformations(diff_data, measurement)
 
-    # 1. Remove the average offset
     remove_average_offset(base_data, diff_data, measurement.mapping)
 
-    # 2. Apply or find the frame offset
     frame_offsets(base_data, diff_data, measurement)
 
-    # 4. Apply or find the scale and rotation
-    # apply_base_rotation(base_data, diff_data, measurement)
     apply_diff_stretch(base_data, diff_data, measurement)
 
     plot_trajectories(base_data, diff_data, measurement, show_plot=True)
@@ -89,72 +83,42 @@ measurements = [
         base_recording="data/asil_01/qtm.csv",
         diff_recording="data/asil_01/front/LITE.csv",
         output_prefxix="data/asil_01/front/",
-        mapping={0: 15},
+        mapping={0: 15, 5: 32},
         diff_frame_offset=71,
         plot_prefix="mediapipe_asil_01_front_LITE",
     ),
-    # Measurement(
-    #     base_recording="data/multicam_asil_01/qtm_multicam_asil_01.csv",
-    #     diff_recording="data/multicam_asil_01/mediapipe_multicam_asil_01_front_LITE.csv",
-    #     unit_conversion=1000,
-    #     base_frame_offset=100,
-    #     diff_frame_offset=100,
-    #     output_prefxix="data/multicam_asil_01/",
-    #     # axis_offset=(0, 0, 0),
-    #     axis_offset=(0, 0, 0),
-    #     axis_scale=(-0.5, 4, -2),
-    #     axis_rotation=0,
-    #     axis_reorder=True,
-    #     mapping={2: 31},
-    #     plot_prefix="mediapipe_multicam_asil_01_front_LITE_4_31",
-    #     base_label="QTM",
-    #     diff_label="Mediapipe",
-    # ),
-    # Measurement(
-    #     base_recording="data/multicam_asil_01/qtm_multicam_asil_01.csv",
-    #     diff_recording="data/multicam_asil_01/mediapipe_multicam_asil_01_front_FULL.csv",
-    #     unit_conversion=1000,
-    #     base_frame_offset=100,
-    #     diff_frame_offset=100,
-    #     output_prefxix="data/multicam_asil_01/",
-    #     # axis_offset=(0, 0, 0),
-    #     axis_offset=(0, 0, 0),
-    #     axis_scale=(-0.5, 4, -2),
-    #     axis_rotation=0,
-    #     axis_reorder=True,
-    #     mapping={0: 15},
-    #     plot_prefix="multicam_asil_01_front_FULL",
-    #     base_label="QTM",
-    #     diff_label="Mediapipe",
-    # ),
-    # Measurement(
-    #     base_recording="data/multicam_asil_01/qtm_multicam_asil_01.csv",
-    #     diff_recording="data/multicam_asil_01/mediapipe_multicam_asil_01_front_HEAVY.csv",
-    #     output_prefxix="data/multicam_asil_01/",
-    #     mapping={0: 15},
-    #     plot_prefix="mediapipe_multicam_asil_01_front_HEAVY",
-    # ),
-    # Measurement(
-    #     base_recording="data/multicam_asil_01/qtm_multicam_asil_01.csv",
-    #     diff_recording="data/multicam_asil_01/mediapipe_multicam_asil_01_left_HEAVY.csv",
-    #     output_prefxix="data/multicam_asil_01/",
-    #     mapping={0: 15},
-    #     base_axis_rotation=180,
-    #     # diff_frame_offset=119,
-    #     plot_prefix="mediapipe_multicam_asil_01_left_HEAVY",
-    # ),
-    # Measurement(
-    #     base_recording="data/multicam_asil_01/qtm_multicam_asil_01.csv",
-    #     diff_recording="data/multicam_asil_01/mediapipe_multicam_asil_01_right_HEAVY.csv",
-    #     output_prefxix="data/multicam_asil_01/",
-    #     mapping={0: 15},
-    #     diff_frame_offset=183,
-    #     base_axis_rotation=40,
-    #     # diff_axis_stretch=(0.5, 3.5, 2),
-    #     plot_prefix="mediapipe_multicam_asil_01_right_HEAVY",
-    # ),
+    Measurement(
+        base_recording="data/asil_01/qtm.csv",
+        diff_recording="data/asil_01/front/FULL.csv",
+        output_prefxix="data/asil_01/front/",
+        mapping={0: 15},
+        diff_frame_offset=71,
+        plot_prefix="mediapipe_asil_01_front_FULL",
+    ),
+    Measurement(
+        base_recording="data/asil_01/qtm.csv",
+        diff_recording="data/asil_01/front/HEAVY.csv",
+        output_prefxix="data/asil_01/front/",
+        mapping={0: 15},
+        diff_frame_offset=71,
+        plot_prefix="mediapipe_asil_01_front_HEAVY",
+    ),
+    Measurement(
+        base_recording="data/asil_01/qtm.csv",
+        diff_recording="data/asil_01/left/HEAVY.csv",
+        output_prefxix="data/asil_01/left/",
+        mapping={0: 15},
+        plot_prefix="mediapipe_asil_01_left_HEAVY",
+    ),
+    Measurement(
+        base_recording="data/asil_01/qtm.csv",
+        diff_recording="data/asil_01/right/HEAVY.csv",
+        output_prefxix="data/asil_01/right/",
+        mapping={0: 15},
+        plot_prefix="mediapipe_asil_01_right_HEAVY",
+    ),
 ]
 
 if __name__ == "__main__":
     for measure in measurements:
-        plot_measurement(measure)
+        analyze(measure)

@@ -17,7 +17,7 @@ class Measurement:
     # Marker mapping, used to map the markers from the base recording to the comparison recording
     mapping: dict[int, int]
 
-    # Path prefix, used to save the measurements in a specific location with a prefix
+    # Path prefix, used to save the measurements in a specific location with a prefix, such as a folder
     output_prefxix: str
     plot_prefix: str
 

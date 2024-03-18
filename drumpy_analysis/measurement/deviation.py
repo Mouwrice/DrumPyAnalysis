@@ -160,15 +160,12 @@ def compute_devations(
             diff_row = diff_frame.rows[diff_marker]
 
             if diff_axis_centers is not None:
-                diff_x = (
-                    diff_row.x - diff_axis_centers[diff_marker][0]
-                ) * diff_axis_stretch[0] + diff_axis_centers[diff_marker][0]
-                diff_y = (
-                    diff_row.y - diff_axis_centers[diff_marker][1]
-                ) * diff_axis_stretch[1] + diff_axis_centers[diff_marker][1]
-                diff_z = (
-                    diff_row.z - diff_axis_centers[diff_marker][2]
-                ) * diff_axis_stretch[2] + diff_axis_centers[diff_marker][2]
+                center_x = diff_axis_centers[diff_marker][0]
+                center_y = diff_axis_centers[diff_marker][1]
+                center_z = diff_axis_centers[diff_marker][2]
+                diff_x = (diff_row.x - center_x) * diff_axis_stretch[0] + center_x
+                diff_y = (diff_row.y - center_y) * diff_axis_stretch[1] + center_y
+                diff_z = (diff_row.z - center_z) * diff_axis_stretch[2] + center_z
             else:
                 diff_x = diff_row.x
                 diff_y = diff_row.y
@@ -247,4 +244,4 @@ def write_deviations(
         # Write the dataframe to the file
         file.write(df.describe().to_string())
 
-        file.write("\n")
+        file.write("\n\n")

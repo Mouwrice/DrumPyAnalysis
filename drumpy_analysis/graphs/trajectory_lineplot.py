@@ -21,7 +21,7 @@ def construct_line(
     """
     line = ([], [])
     for frame in frames:
-        line[0].append(frame.time_ms)
+        line[0].append(frame.time_ms / 1000)
         match axis:
             case Axis.X:
                 line[1].append(frame.rows[marker].x)
@@ -52,7 +52,7 @@ def plot_axis(
 
     plot = figure(
         title=title,
-        x_axis_label="Frame",
+        x_axis_label="Time (s)",
         y_axis_label="Position",
         sizing_mode="stretch_both",
     )
