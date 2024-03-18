@@ -1,39 +1,9 @@
 from drumpy_analysis.measurement.frame import Frame, frames_from_csv
 from graphs.trajectory_lineplot import plot_trajectories
-from measurement.apply_scale_rotation import apply_scale_rotation
-from measurement.deviation import calculate_deviations
-from measurement.find_optimal_offset import (
-    find_optimal_diff_offset,
-    find_optimal_base_offset,
-)
+from measurement.deviation import remove_average_offset
+from measurement.find_optimal_stretch import apply_diff_stretch
+from measurement.frame_offset import frame_offsets
 from measurement.measurement import Measurement
-
-
-def remove_time_offset(frames: list[Frame]):
-    """
-    Remove the time offset from the frames
-    """
-    time_offset = frames[0].time_ms
-    for frame in frames:
-        frame.time_ms -= time_offset
-
-
-def remove_average_offset(
-    base_data: list[Frame],
-    diff_data: list[Frame],
-    mapping: dict[int, int],
-):
-    """
-    Remove the average offset of the diff data compared to the base data.
-    Per axis.
-    """
-    deviations = calculate_deviations(base_data, diff_data, mapping)
-    for key, value in mapping.items():
-        print(f"Average deviation for marker {key} and {value}: {deviations[key]}")
-        for frame in diff_data:
-            frame.rows[value].x += deviations[key].x
-            frame.rows[value].y += deviations[key].y
-            frame.rows[value].z += deviations[key].z
 
 
 def apply_axis_transformations(frames: list[Frame], measurement: Measurement):
@@ -61,43 +31,6 @@ def apply_axis_transformations(frames: list[Frame], measurement: Measurement):
             row.z += measurement.diff_axis_offset[2]
 
 
-def frame_offsets(
-    base_data: list[Frame],
-    diff_data: list[Frame],
-    measurement: Measurement,
-):
-    assert (
-        measurement.base_frame_offset is not None
-        or measurement.diff_frame_offset is not None
-    ), "Either the base or diff frame offset should be set to align the frames."
-
-    if measurement.base_frame_offset is None:
-        base_offset = find_optimal_base_offset(
-            base_data,
-            diff_data,
-        )
-        print(f"Base offset: {base_offset}")
-        measurement.base_frame_offset = base_offset
-        base_data = base_data[base_offset:]
-    else:
-        base_data = base_data[measurement.base_frame_offset :]
-
-    if measurement.diff_frame_offset is None:
-        diff_offset = find_optimal_diff_offset(
-            base_data,
-            diff_data,
-        )
-        print(f"Diff offset: {diff_offset}")
-        measurement.diff_frame_offset = diff_offset
-        diff_data = diff_data[diff_offset:]
-
-    else:
-        diff_data = diff_data[measurement.diff_frame_offset :]
-
-    remove_time_offset(diff_data)
-    remove_time_offset(base_data)
-
-
 def plot_measurement(measurement: Measurement):
     """
     Plots the measurement
@@ -118,7 +51,9 @@ def plot_measurement(measurement: Measurement):
 
     # 4. Apply or find the scale and rotation
     # apply_base_rotation(base_data, diff_data, measurement)
-    apply_scale_rotation(base_data, diff_data, measurement)
+    apply_diff_stretch(base_data, diff_data, measurement)
+
+    remove_average_offset(base_data, diff_data, measurement.mapping)
 
     plot_trajectories(base_data, diff_data, measurement, show_plot=True)
     # deviations_boxplot(base_data, diff_data, measurement, file=file)
@@ -139,14 +74,14 @@ qtm_to_mediapipe_compact = {
 }
 
 measurements = [
-    # Measurement(
-    #     base_recording="data/multicam_asil_01/qtm_multicam_asil_01.csv",
-    #     diff_recording="data/multicam_asil_01/mediapipe_multicam_asil_01_front_LITE.csv",
-    #     output_prefxix="data/multicam_asil_01/",
-    #     mapping={0: 15},
-    #     diff_frame_offset=81,
-    #     plot_prefix="mediapipe_multicam_asil_01_front_LITE",
-    # ),
+    Measurement(
+        base_recording="data/multicam_asil_01/qtm_multicam_asil_01.csv",
+        diff_recording="data/multicam_asil_01/mediapipe_multicam_asil_01_front_LITE.csv",
+        output_prefxix="data/multicam_asil_01/",
+        mapping={0: 15},
+        diff_frame_offset=71,
+        plot_prefix="mediapipe_multicam_asil_01_front_LITE",
+    ),
     # Measurement(
     #     base_recording="data/multicam_asil_01/qtm_multicam_asil_01.csv",
     #     diff_recording="data/multicam_asil_01/mediapipe_multicam_asil_01_front_LITE.csv",
@@ -188,20 +123,23 @@ measurements = [
     #     mapping={0: 15},
     #     plot_prefix="mediapipe_multicam_asil_01_front_HEAVY",
     # ),
-    Measurement(
-        base_recording="data/multicam_asil_01/qtm_multicam_asil_01.csv",
-        diff_recording="data/multicam_asil_01/mediapipe_multicam_asil_01_left_HEAVY.csv",
-        output_prefxix="data/multicam_asil_01/",
-        mapping={0: 15},
-        diff_frame_offset=119,
-        plot_prefix="mediapipe_multicam_asil_01_left_HEAVY",
-    ),
+    # Measurement(
+    #     base_recording="data/multicam_asil_01/qtm_multicam_asil_01.csv",
+    #     diff_recording="data/multicam_asil_01/mediapipe_multicam_asil_01_left_HEAVY.csv",
+    #     output_prefxix="data/multicam_asil_01/",
+    #     mapping={0: 15},
+    #     base_axis_rotation=180,
+    #     # diff_frame_offset=119,
+    #     plot_prefix="mediapipe_multicam_asil_01_left_HEAVY",
+    # ),
     # Measurement(
     #     base_recording="data/multicam_asil_01/qtm_multicam_asil_01.csv",
     #     diff_recording="data/multicam_asil_01/mediapipe_multicam_asil_01_right_HEAVY.csv",
     #     output_prefxix="data/multicam_asil_01/",
     #     mapping={0: 15},
     #     diff_frame_offset=183,
+    #     base_axis_rotation=40,
+    #     # diff_axis_stretch=(0.5, 3.5, 2),
     #     plot_prefix="mediapipe_multicam_asil_01_right_HEAVY",
     # ),
 ]

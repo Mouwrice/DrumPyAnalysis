@@ -80,7 +80,7 @@ def calculate_deviations(
     mapping: dict[int, int],
     base_time_offset: int = 0,
     diff_time_offset: int = 0,
-    base_rotation: float = 0,
+    base_rotation: float | None = None,
     stretch_diff: tuple[float, float, float] = (1, 1, 1),
     stretch_centers_diff: dict[int, tuple[float, float, float]] = None,
 ) -> dict[int, Deviation]:
@@ -116,9 +116,14 @@ def calculate_deviations(
 
         for base_marker, diff_marker in mapping.items():
             base_row = base_frame.rows[base_marker]
-            base_x, base_y, base_z = rotation.apply(
-                [base_row.x, base_row.y, base_row.z]
-            )
+            if base_rotation is not None:
+                base_x, base_y, base_z = rotation.apply(
+                    [base_row.x, base_row.y, base_row.z]
+                )
+            else:
+                base_x = base_row.x
+                base_y = base_row.y
+                base_z = base_row.z
 
             diff_row = diff_frame.rows[diff_marker]
 
@@ -179,3 +184,20 @@ def calculate_deviations(
         deviations[key].euclidean_distance /= count
 
     return deviations
+
+
+def remove_average_offset(
+    base_data: list[Frame],
+    diff_data: list[Frame],
+    mapping: dict[int, int],
+):
+    """
+    Remove the average offset of the diff data compared to the base data.
+    Per axis.
+    """
+    deviations = calculate_deviations(base_data, diff_data, mapping)
+    for key, value in mapping.items():
+        for frame in diff_data:
+            frame.rows[value].x += deviations[key].x
+            frame.rows[value].y += deviations[key].y
+            frame.rows[value].z += deviations[key].z
