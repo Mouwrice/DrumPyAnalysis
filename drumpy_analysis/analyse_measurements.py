@@ -1,6 +1,11 @@
 from drumpy_analysis.measurement.frame import Frame, frames_from_csv
+from graphs.deviations_boxplot import deviations_boxplot
 from graphs.trajectory_lineplot import plot_trajectories
-from measurement.deviation import remove_average_offset
+from measurement.deviation import (
+    remove_average_offset,
+    compute_deviations_from_measurement,
+    write_deviations,
+)
 from measurement.find_optimal_stretch import apply_diff_stretch
 from measurement.frame_offset import frame_offsets
 from measurement.measurement import Measurement
@@ -46,17 +51,23 @@ def plot_measurement(measurement: Measurement):
     # 2. Apply or find the frame offset
     frame_offsets(base_data, diff_data, measurement)
 
-    # 3. Remove the average offset again, now that the frames are aligned
-    remove_average_offset(base_data, diff_data, measurement.mapping)
-
     # 4. Apply or find the scale and rotation
     # apply_base_rotation(base_data, diff_data, measurement)
     apply_diff_stretch(base_data, diff_data, measurement)
 
-    remove_average_offset(base_data, diff_data, measurement.mapping)
-
     plot_trajectories(base_data, diff_data, measurement, show_plot=True)
-    # deviations_boxplot(base_data, diff_data, measurement, file=file)
+
+    deviations = {}
+    compute_deviations_from_measurement(base_data, diff_data, measurement, deviations)
+
+    deviations_boxplot(deviations, measurement)
+
+    # Write the obtained results to a file
+    with open(
+        f"{measurement.output_prefxix}{measurement.plot_prefix}_results.txt", "w"
+    ) as f:
+        measurement.write(f)
+        write_deviations(deviations, f)
 
 
 qtm_to_mediapipe = {
@@ -75,12 +86,12 @@ qtm_to_mediapipe_compact = {
 
 measurements = [
     Measurement(
-        base_recording="data/multicam_asil_01/qtm_multicam_asil_01.csv",
-        diff_recording="data/multicam_asil_01/mediapipe_multicam_asil_01_front_LITE.csv",
-        output_prefxix="data/multicam_asil_01/",
+        base_recording="data/asil_01/qtm.csv",
+        diff_recording="data/asil_01/front/LITE.csv",
+        output_prefxix="data/asil_01/front/",
         mapping={0: 15},
         diff_frame_offset=71,
-        plot_prefix="mediapipe_multicam_asil_01_front_LITE",
+        plot_prefix="mediapipe_asil_01_front_LITE",
     ),
     # Measurement(
     #     base_recording="data/multicam_asil_01/qtm_multicam_asil_01.csv",

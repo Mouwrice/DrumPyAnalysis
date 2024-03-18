@@ -1,4 +1,5 @@
 from dataclasses import dataclass, asdict
+from typing import TextIO
 
 
 @dataclass
@@ -52,3 +53,6 @@ class Measurement:
 
     def to_string(self):
         return "\n".join([f"{k}: {str(v)}" for k, v in asdict(self).items()])
+
+    def write(self, file: TextIO):
+        file.write(self.to_string())

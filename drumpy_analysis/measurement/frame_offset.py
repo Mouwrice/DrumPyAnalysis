@@ -1,4 +1,4 @@
-from measurement.deviation import calculate_deviations
+from measurement.deviation import compute_devations
 from measurement.frame import Frame
 from measurement.measurement import Measurement
 
@@ -26,15 +26,15 @@ def find_optimal_base_offset(
     lowest_deviation = float("inf")
     for offset in range(min(len(base_data) - 2, max_offset)):
         # Calculate the deviations
-        deviations = calculate_deviations(
+        deviations = compute_devations(
             base_data[offset:],
             diff_data,
             {0: 15},
-            base_time_offset=base_data[offset].time_ms,
-            diff_time_offset=diff_data[0].time_ms,
+            base_offset=base_data[offset].time_ms,
+            diff_offset=diff_data[0].time_ms,
         )
         # The average deviation of the z axis
-        deviation = deviations.get(0).z_abs
+        deviation = deviations.get(0).deviation_z
         if deviation < lowest_deviation:
             lowest_deviation = deviation
             print(f"Base offset: {offset}, Average z-axis deviation: {deviation}")
@@ -56,15 +56,15 @@ def find_optimal_diff_offset(
     lowest_deviation = float("inf")
     for offset in range(min(len(diff_data) - 2, max_offset)):
         # Calculate the deviations
-        deviations = calculate_deviations(
+        deviations = compute_devations(
             base_data,
             diff_data[offset:],
             {0: 15},
-            base_time_offset=base_data[0].time_ms,
-            diff_time_offset=diff_data[offset].time_ms,
+            base_offset=base_data[0].time_ms,
+            diff_offset=diff_data[offset].time_ms,
         )
         # The average deviation of the z axis
-        deviation = deviations.get(0).z_abs
+        deviation = deviations.get(0).deviation_z
         if deviation < lowest_deviation:
             lowest_deviation = deviation
             print(f"Diff offset: {offset}, Average z-axis deviation: {deviation}")

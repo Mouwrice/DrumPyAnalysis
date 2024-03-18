@@ -2,7 +2,7 @@ import math
 
 from scipy.spatial.transform import Rotation
 
-from measurement.deviation import average_absolute_deviation
+from measurement.deviation import compute_average_deviation
 from measurement.frame import Frame
 from measurement.measurement import Measurement
 
@@ -24,15 +24,15 @@ class DeviationFunction:
         Calculate the deviation for the given rotation.
         We are only interested in the x and y-axis deviation.
         """
-        dev = average_absolute_deviation(
+        dev = compute_average_deviation(
             self.base_data,
             self.diff_data,
             self.measurement.mapping,
             base_rotation=rotation,
-            stretch_diff=self.measurement.diff_axis_stretch,
-            stretch_centers_diff=self.measurement.diff_stretch_centers,
+            diff_axis_stretch=self.measurement.diff_axis_stretch,
+            diff_axis_centers=self.measurement.diff_stretch_centers,
         )
-        return dev.x_abs, dev.y_abs
+        return dev.deviation_x, dev.deviation_y
 
 
 def find_optimal_base_rotation(

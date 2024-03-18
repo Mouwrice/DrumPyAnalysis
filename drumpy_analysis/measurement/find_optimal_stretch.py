@@ -1,6 +1,6 @@
 import math
 
-from measurement.deviation import average_absolute_deviation
+from measurement.deviation import compute_average_deviation
 from measurement.frame import Frame, get_marker_centers
 from measurement.measurement import Measurement
 
@@ -15,41 +15,39 @@ class DeviationFunction:
         base_data: list[Frame],
         diff_data: list[Frame],
         measurement: Measurement,
-        stretch_centers_diff: dict[int, tuple[float, float, float]],
     ):
         self.base_data = base_data
         self.diff_data = diff_data
         self.measurement = measurement
-        self.stretch_centers_diff = stretch_centers_diff
 
     def calculate(self, stretch: list[float]) -> tuple[float, float, float]:
         """
         Calculate the deviation for the given scale
         """
-        dev = average_absolute_deviation(
+        dev = compute_average_deviation(
             self.base_data,
             self.diff_data,
             self.measurement.mapping,
             base_rotation=self.measurement.base_axis_rotation,
-            stretch_diff=(stretch[0], stretch[1], stretch[2]),
-            stretch_centers_diff=self.stretch_centers_diff,
+            diff_axis_stretch=(stretch[0], stretch[1], stretch[2]),
+            diff_axis_centers=self.measurement.diff_stretch_centers,
         )
-        return dev.x_abs, dev.y_abs, dev.z_abs
+        return dev.deviation_x, dev.deviation_y, dev.deviation_z
 
 
 def find_optimal_diff_scale(
     base_data: list[Frame],
     diff_data: list[Frame],
-    scale_centers_diff: dict[int, tuple[float, float, float]],
     measurement: Measurement,
 ) -> tuple[float, float, float]:
     """
     Find the optimal scale for the diff (x, y, z) compared to the base.
     Assumes the deviation has a minimum at the optimal scale.
-    Uses Golden-section search to find the optimal scale for each axis.
+    Uses Golden-section search to find the optimal scale for each axis. But using the squared deviation instead of the
+    deviation itself.
     :return: The optimal scale found
     """
-    deviator = DeviationFunction(base_data, diff_data, measurement, scale_centers_diff)
+    deviator = DeviationFunction(base_data, diff_data, measurement)
 
     # The golden ratio gets used to find points to check in Golden-section search
     golden_ration = (math.sqrt(5) + 1) / 2
@@ -129,23 +127,22 @@ def apply_diff_stretch(
     """
     Apply the optimal scale to the diff data
     """
-    scale_centers_diff = get_marker_centers(diff_data, measurement.mapping)
+    measurement.diff_stretch_centers = get_marker_centers(
+        diff_data, measurement.mapping
+    )
 
     if measurement.diff_axis_stretch is None:
         measurement.diff_axis_stretch = find_optimal_diff_scale(
-            base_data, diff_data, scale_centers_diff, measurement
+            base_data, diff_data, measurement
         )
 
     scale = measurement.diff_axis_stretch
     for frame in diff_data:
-        for key in scale_centers_diff.keys():
+        for key in measurement.diff_stretch_centers.keys():
             row = frame.rows[key]
-            row.x = (row.x - scale_centers_diff[key][0]) * scale[
-                0
-            ] + scale_centers_diff[key][0]
-            row.y = (row.y - scale_centers_diff[key][1]) * scale[
-                1
-            ] + scale_centers_diff[key][1]
-            row.z = (row.z - scale_centers_diff[key][2]) * scale[
-                2
-            ] + scale_centers_diff[key][2]
+            x_center = measurement.diff_stretch_centers[key][0]
+            y_center = measurement.diff_stretch_centers[key][1]
+            z_center = measurement.diff_stretch_centers[key][2]
+            row.x = (row.x - x_center) * scale[0] + x_center
+            row.y = (row.y - y_center) * scale[1] + y_center
+            row.z = (row.z - z_center) * scale[2] + z_center
