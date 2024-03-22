@@ -28,6 +28,7 @@ class DeviationFunction:
             self.base_data,
             self.diff_data,
             self.measurement.mapping,
+            self.measurement.dominant_fps,
             base_rotation=self.measurement.base_axis_rotation,
             diff_axis_stretch=(stretch[0], stretch[1], stretch[2]),
             diff_axis_centers=self.measurement.diff_stretch_centers,

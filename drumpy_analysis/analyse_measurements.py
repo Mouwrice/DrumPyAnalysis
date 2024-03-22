@@ -2,9 +2,9 @@ from drumpy_analysis.measurement.frame import Frame, frames_from_csv
 from graphs.deviations_boxplot import deviations_boxplot
 from graphs.trajectory_lineplot import plot_trajectories
 from measurement.deviation import (
-    remove_average_offset,
     compute_deviations_from_measurement,
     write_deviations,
+    remove_average_offset,
 )
 from measurement.find_optimal_stretch import apply_diff_stretch
 from measurement.frame_offset import frame_offsets
@@ -43,11 +43,21 @@ def analyze(measurement: Measurement):
 
     apply_axis_transformations(diff_data, measurement)
 
-    remove_average_offset(base_data, diff_data, measurement.mapping)
+    remove_average_offset(
+        base_data, diff_data, measurement.mapping, measurement.dominant_fps
+    )
 
     frame_offsets(base_data, diff_data, measurement)
 
+    remove_average_offset(
+        base_data, diff_data, measurement.mapping, measurement.dominant_fps
+    )
+
     apply_diff_stretch(base_data, diff_data, measurement)
+
+    remove_average_offset(
+        base_data, diff_data, measurement.mapping, measurement.dominant_fps
+    )
 
     plot_trajectories(base_data, diff_data, measurement, show_plot=True)
 
@@ -84,39 +94,52 @@ measurements = [
         diff_recording="data/asil_01/front/LITE.csv",
         output_prefxix="data/asil_01/front/",
         mapping={0: 15, 5: 32},
-        diff_frame_offset=71,
+        # diff_frame_offset=71,
         plot_prefix="mediapipe_asil_01_front_LITE",
     ),
-    Measurement(
-        base_recording="data/asil_01/qtm.csv",
-        diff_recording="data/asil_01/front/FULL.csv",
-        output_prefxix="data/asil_01/front/",
-        mapping={0: 15},
-        diff_frame_offset=71,
-        plot_prefix="mediapipe_asil_01_front_FULL",
-    ),
-    Measurement(
-        base_recording="data/asil_01/qtm.csv",
-        diff_recording="data/asil_01/front/HEAVY.csv",
-        output_prefxix="data/asil_01/front/",
-        mapping={0: 15},
-        diff_frame_offset=71,
-        plot_prefix="mediapipe_asil_01_front_HEAVY",
-    ),
-    Measurement(
-        base_recording="data/asil_01/qtm.csv",
-        diff_recording="data/asil_01/left/HEAVY.csv",
-        output_prefxix="data/asil_01/left/",
-        mapping={0: 15},
-        plot_prefix="mediapipe_asil_01_left_HEAVY",
-    ),
-    Measurement(
-        base_recording="data/asil_01/qtm.csv",
-        diff_recording="data/asil_01/right/HEAVY.csv",
-        output_prefxix="data/asil_01/right/",
-        mapping={0: 15},
-        plot_prefix="mediapipe_asil_01_right_HEAVY",
-    ),
+    # Measurement(
+    #     base_recording="data/asil_01/qtm.csv",
+    #     diff_recording="data/asil_01/qtm.csv",
+    #     output_prefxix="data/asil_01/",
+    #     mapping={0: 0},
+    #     diff_frame_offset=0,
+    #     base_axis_rotation=0,
+    #     unit_conversion=1,
+    #     diff_axis_reorder=False,
+    #     plot_prefix="qtm_qtm_offset",
+    #     diff_axis_offset=(34.239934, 222.303153, 124.164521),
+    #     diff_flip_axis=(False, False, False),
+    # ),
+    # Measurement(
+    #     base_recording="data/asil_01/qtm.csv",
+    #     diff_recording="data/asil_01/front/FULL.csv",
+    #     output_prefxix="data/asil_01/front/",
+    #     mapping={0: 15},
+    #     diff_frame_offset=71,
+    #     plot_prefix="mediapipe_asil_01_front_FULL",
+    # ),
+    # Measurement(
+    #     base_recording="data/asil_01/qtm.csv",
+    #     diff_recording="data/asil_01/front/HEAVY.csv",
+    #     output_prefxix="data/asil_01/front/",
+    #     mapping={0: 15},
+    #     diff_frame_offset=71,
+    #     plot_prefix="mediapipe_asil_01_front_HEAVY",
+    # ),
+    # Measurement(
+    #     base_recording="data/asil_01/qtm.csv",
+    #     diff_recording="data/asil_01/left/HEAVY.csv",
+    #     output_prefxix="data/asil_01/left/",
+    #     mapping={0: 15},
+    #     plot_prefix="mediapipe_asil_01_left_HEAVY",
+    # ),
+    # Measurement(
+    #     base_recording="data/asil_01/qtm.csv",
+    #     diff_recording="data/asil_01/right/HEAVY.csv",
+    #     output_prefxix="data/asil_01/right/",
+    #     mapping={0: 15},
+    #     plot_prefix="mediapipe_asil_01_right_HEAVY",
+    # ),
 ]
 
 if __name__ == "__main__":

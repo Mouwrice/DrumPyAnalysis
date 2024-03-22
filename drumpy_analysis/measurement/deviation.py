@@ -47,6 +47,7 @@ def compute_deviations_from_measurement(
         base_data,
         diff_data,
         measurement.mapping,
+        measurement.dominant_fps,
         measurement.base_frame_offset,
         measurement.diff_frame_offset,
         measurement.base_axis_rotation,
@@ -60,6 +61,7 @@ def compute_average_deviation(
     base: list[Frame],
     diff: list[Frame],
     mapping: dict[int, int],
+    dominant_fps: int,
     base_offset: int = 0,
     diff_offset: int = 0,
     base_rotation: float = 0,
@@ -82,12 +84,15 @@ def compute_average_deviation(
     When the stretch is zero, all points converge to this center.
     The center is specified for each marker.
     away from this point. The center is specified for each marker.
+    :param dominant_fps: Which frame rate should be used, base or diff (0 or 1) or take all frames into account (None).
+    :return: The average deviation
     """
 
     deviations = compute_devations(
         base,
         diff,
         mapping,
+        dominant_fps,
         base_offset,
         diff_offset,
         base_rotation,
@@ -107,6 +112,7 @@ def compute_devations(
     base: list[Frame],
     diff: list[Frame],
     mapping: dict[int, int],
+    dominant_fps: int,
     base_offset: int = 0,
     diff_offset: int = 0,
     base_rotation: float | None = None,
@@ -129,6 +135,8 @@ def compute_devations(
     The center is specified for each marker.
     :param deviation_lists: Pass a dictionary to store the deviations for each individual frame.
     A deviation is not particularly assigned to a frame, as we perform the computation over all combined frames.
+    :param dominant_fps: Which frame rate should be used, base or diff (0 or 1).
+
     :return: For each marker, a Deviation
     """
     base_index = 0
@@ -187,24 +195,34 @@ def compute_devations(
                 deviation_lists[diff_marker].append(deviation)
 
         # The time stamps are not aligned, the next frame is the frame with the closest time stamp
-        base_time = base_frame.time_ms - base_offset
-        diff_time = diff_frame.time_ms - diff_offset
-        next_base_time = base[base_index + 1].time_ms - base_offset
-        next_diff_time = diff[diff_index + 1].time_ms - diff_offset
-        if next_base_time < next_diff_time:
+        if dominant_fps == 0:
             base_index += 1
             base_frame = base[base_index]
+            base_time = base_frame.time_ms - base_offset
             # Find the diff frame that is closest in time
-            if abs(next_base_time - diff_time) > abs(next_base_time - next_diff_time):
-                diff_index += 1
+            while diff_index < len(diff) - 1:
                 diff_frame = diff[diff_index]
-        else:
+                diff_time = diff_frame.time_ms - diff_offset
+                # If the difference in time becomes larger, we have found the closest frame
+                next_frame = diff[diff_index + 1]
+                next_time = next_frame.time_ms - diff_offset
+                if abs(base_time - diff_time) < abs(base_time - next_time):
+                    break
+                diff_index += 1
+        elif dominant_fps == 1:
             diff_index += 1
             diff_frame = diff[diff_index]
+            diff_time = diff_frame.time_ms - diff_offset
             # Find the base frame that is closest in time
-            if abs(next_diff_time - base_time) > abs(next_diff_time - next_base_time):
-                base_index += 1
+            while base_index < len(base) - 1:
                 base_frame = base[base_index]
+                base_time = base_frame.time_ms - base_offset
+                # If the difference in time becomes larger, we have found the closest frame
+                next_frame = base[base_index + 1]
+                next_time = next_frame.time_ms - base_offset
+                if abs(diff_time - base_time) < abs(diff_time - next_time):
+                    break
+                base_index += 1
 
     for key, value in mapping.items():
         deviations[key].divide(count)
@@ -216,12 +234,13 @@ def remove_average_offset(
     base_data: list[Frame],
     diff_data: list[Frame],
     mapping: dict[int, int],
+    dominant_fps: int,
 ):
     """
     Remove the average offset of the diff data compared to the base data.
     Per axis.
     """
-    deviations = compute_devations(base_data, diff_data, mapping)
+    deviations = compute_devations(base_data, diff_data, mapping, dominant_fps)
     for key, value in mapping.items():
         for frame in diff_data:
             frame.rows[value].x += deviations[key].offset_x

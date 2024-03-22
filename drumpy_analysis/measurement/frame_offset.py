@@ -30,6 +30,7 @@ def find_optimal_base_offset(
             base_data[offset:],
             diff_data,
             {0: 15},
+            0,
             base_offset=base_data[offset].time_ms,
             diff_offset=diff_data[0].time_ms,
         )
@@ -60,6 +61,7 @@ def find_optimal_diff_offset(
             base_data,
             diff_data[offset:],
             {0: 15},
+            1,
             base_offset=base_data[0].time_ms,
             diff_offset=diff_data[offset].time_ms,
         )

@@ -47,6 +47,9 @@ class Measurement:
     base_frame_offset: int | None = 0
     diff_frame_offset: int | None = None
 
+    # Which frame rate should be used, base or diff (0 or 1)
+    dominant_fps: int = 1
+
     # The label of the base and diff recording
     base_label: str = "Qualisys"
     diff_label: str = "Mediapipe"
