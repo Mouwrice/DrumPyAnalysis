@@ -11,7 +11,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.dependencies]
 python = "~3.11"
 qtm-rt = "3.0.1"
-bokeh = "3.3.4"
+bokeh = "3.4.0"
 matplotlib = "3.8.3"
 scipy = "^1.12.0"
 line-profiler-pycharm = "^1.1.0"
