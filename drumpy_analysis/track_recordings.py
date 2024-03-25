@@ -1,5 +1,3 @@
-from multiprocessing import Pool
-
 from drumpy.app.main import App
 from drumpy.app.video_source import Source
 from drumpy.landmarkermodel import LandmarkerModel
@@ -12,7 +10,7 @@ and output the results to a csv file
 
 def track_redcordings():
     recordings = [
-        # "../recordings/multicam_asil_01_front.mkv",
+        "../recordings/multicam_asil_01_front.mkv",
         # "../recordings/multicam_asil_01_left.mkv",
         # "../recordings/multicam_asil_01_right.mkv",
         # "../recordings/multicam_asil_02_front.mkv",
@@ -29,25 +27,24 @@ def track_redcordings():
         # "../recordings/multicam_ms_02_right.mkv",
     ]
 
-    models = [LandmarkerModel.LITE, LandmarkerModel.FULL]  # , LandmarkerModel.HEAVY]
+    models = [LandmarkerModel.LITE, LandmarkerModel.FULL, LandmarkerModel.HEAVY]
 
     for recording in recordings:
         for model in models:
             file_name = recording.split("/")[-1].replace(".mkv", "")
-            # omit everything after th second underscore
-            directory = "_".join(file_name.split("_")[:3])
+            # omit everything after the second underscore
+            split_name = file_name.split("_")
+            directory = f"{'_'.join(split_name[1:3])}/{split_name[3]}"
             print(f"Recording: {recording}, Model: {model}, Async")
 
-            with Pool(processes=6) as pool:
-                app = App(
-                    pool,
-                    source=Source.FILE,
-                    file_path=recording,
-                    live_stream=True,
-                    model=model,
-                    log_file=f"./data/{directory}/mediapipe_{file_name}_{model.name}.csv",
-                )
-                app.start()
+            app = App(
+                source=Source.FILE,
+                file_path=recording,
+                live_stream=True,
+                model=model,
+                log_file=f"./data/{directory}/mediapipe_{model.name}.csv",
+            )
+            app.start()
 
 
 if __name__ == "__main__":
