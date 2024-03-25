@@ -52,16 +52,10 @@ def get_marker_centers(
                 marker_centers[marker] = (0, 0, 0)
             row = frame.rows[marker]
             marker_centers[marker] = (
-                marker_centers[marker][0] + row.x,
-                marker_centers[marker][1] + row.y,
-                marker_centers[marker][2] + row.z,
+                marker_centers[marker][0] + (row.x / len(frames)),
+                marker_centers[marker][1] + (row.y / len(frames)),
+                marker_centers[marker][2] + (row.z / len(frames)),
             )
-    for key in marker_centers.keys():
-        marker_centers[key] = (
-            marker_centers[key][0] / len(frames),
-            marker_centers[key][1] / len(frames),
-            marker_centers[key][2] / len(frames),
-        )
     return marker_centers
 
 

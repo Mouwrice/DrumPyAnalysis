@@ -66,6 +66,7 @@ def compute_average_deviation(
     base_rotation: float = 0,
     diff_axis_stretch: tuple[float, float, float] = (1, 1, 1),
     diff_axis_centers: dict[int, tuple[float, float, float]] = (0, 0, 0),
+    threshold: float = 0,
 ) -> Deviation:
     """
     Calculate the average deviation between the base and diff data.
@@ -79,11 +80,13 @@ def compute_average_deviation(
     :param diff_offset: The time offset for the diff data
     :param base_rotation: The rotation to apply to the base data around the vertical (z) axis, default is 0
     :param diff_axis_stretch: The stretch to apply to the diff data, default is (1, 1, 1), (x, y, z)
-    :param diff_axis_centers: The center of the stretct, values that lie on this point are not changed.
+    :param diff_axis_centers: The center of the stretch, values that lie on this point are not changed.
     When the stretch is zero, all points converge to this center.
     The center is specified for each marker.
     away from this point. The center is specified for each marker.
     :param dominant_fps: Which frame rate should be used, base or diff (0 or 1) or take all frames into account (None).
+    :param threshold: The amount of deviation around the center that is to be considered as noise.
+
     :return: The average deviation
     """
 
@@ -97,6 +100,7 @@ def compute_average_deviation(
         base_rotation,
         diff_axis_stretch,
         diff_axis_centers,
+        threshold=threshold,
     )
 
     average = Deviation(0, 0, 0, 0, 0, 0, 0)
@@ -118,6 +122,7 @@ def compute_devations(
     diff_axis_stretch: tuple[float, float, float] = (1, 1, 1),
     diff_axis_centers: dict[int, tuple[float, float, float]] = None,
     deviation_lists: dict[int, list[Deviation]] = None,
+    threshold: float = 0,
 ) -> dict[int, Deviation]:
     """
     Calculate the absolute deviation between the base and diff data
@@ -129,12 +134,14 @@ def compute_devations(
     :param diff_offset: The time offset for the diff data
     :param base_rotation: The rotation to apply to the base data around the vertical (z) axis, default is 0
     :param diff_axis_stretch: The stretch to apply to the diff data, default is (1, 1, 1), (x, y, z)
-    :param diff_axis_centers: The center of the stretct, values that lie on this point are not changed.
+    :param diff_axis_centers: The center of the stretct, values that lie on this point are not changed. Defaults to 0, 0, 0.
     When the stretch is zero, all points converge to this center.
     The center is specified for each marker.
     :param deviation_lists: Pass a dictionary to store the deviations for each individual frame.
     A deviation is not particularly assigned to a frame, as we perform the computation over all combined frames.
     :param dominant_fps: Which frame rate should be used, base or diff (0 or 1).
+    :param threshold: The amount of deviation around the center (diff_axis_centers) that is to be considered as noise.
+
 
     :return: For each marker, a Deviation
     """
@@ -146,6 +153,9 @@ def compute_devations(
     for key in mapping.keys():
         deviations[key] = Deviation(0, 0, 0, 0, 0, 0, 0)
 
+    if diff_axis_centers is None:
+        diff_axis_centers = {}
+
     rotation = Rotation.from_euler("z", base_rotation, degrees=True)
 
     count = 0
@@ -154,6 +164,9 @@ def compute_devations(
         count += 1
 
         for base_marker, diff_marker in mapping.items():
+            if base_marker not in diff_axis_centers:
+                diff_axis_centers[base_marker] = (0, 0, 0)
+
             base_row = base_frame.rows[base_marker]
             if base_rotation is not None:
                 base_x, base_y, base_z = rotation.apply(
@@ -166,17 +179,21 @@ def compute_devations(
 
             diff_row = diff_frame.rows[diff_marker]
 
-            if diff_axis_centers is not None:
-                center_x = diff_axis_centers[diff_marker][0]
-                center_y = diff_axis_centers[diff_marker][1]
-                center_z = diff_axis_centers[diff_marker][2]
-                diff_x = (diff_row.x - center_x) * diff_axis_stretch[0] + center_x
-                diff_y = (diff_row.y - center_y) * diff_axis_stretch[1] + center_y
-                diff_z = (diff_row.z - center_z) * diff_axis_stretch[2] + center_z
-            else:
-                diff_x = diff_row.x
-                diff_y = diff_row.y
-                diff_z = diff_row.z
+            center_x = diff_axis_centers[base_marker][0]
+            center_y = diff_axis_centers[base_marker][1]
+            center_z = diff_axis_centers[base_marker][2]
+            diff_offset_x = diff_row.x - center_x
+            diff_offset_y = diff_row.y - center_y
+            diff_offset_z = diff_row.z - center_z
+            if abs(diff_offset_x) < threshold:
+                diff_offset_x = 0
+            if abs(diff_offset_y) < threshold:
+                diff_offset_y = 0
+            if abs(diff_offset_z) < threshold:
+                diff_offset_z = 0
+            diff_x = diff_offset_x * diff_axis_stretch[0] + center_x
+            diff_y = diff_offset_y * diff_axis_stretch[1] + center_y
+            diff_z = diff_offset_z * diff_axis_stretch[2] + center_z
 
             x = base_x - diff_x
             y = base_y - diff_y

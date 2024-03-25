@@ -1,7 +1,7 @@
 import math
 
 from drumpy_analysis.measurement.deviation import compute_average_deviation
-from drumpy_analysis.measurement.frame import Frame, get_marker_centers
+from drumpy_analysis.measurement.frame import Frame
 from drumpy_analysis.measurement.measurement import Measurement
 
 
@@ -31,7 +31,8 @@ class DeviationFunction:
             self.measurement.dominant_fps,
             base_rotation=self.measurement.base_axis_rotation,
             diff_axis_stretch=(stretch[0], stretch[1], stretch[2]),
-            diff_axis_centers=self.measurement.diff_stretch_centers,
+            diff_axis_centers=self.measurement.base_centers,
+            threshold=0,  # We ignore deviations that are smaller than 10mm
         )
         return dev.deviation_x, dev.deviation_y, dev.deviation_z
 
@@ -56,8 +57,8 @@ def find_optimal_diff_scale(
     print("\n --- Finding optimal stretch for diff data ---\n")
 
     # The minimum and maximum scale
-    left_bound: list[float] = [0, 0, 0]
-    right_bound: list[float] = [10, 10, 10]
+    left_bound: list[float] = [0.5, 0, 0]
+    right_bound: list[float] = [0.5, 10, 10]
 
     print(f"Stretch left_bound: {left_bound}")
     print(f"Stretch right_bound: {right_bound}")
@@ -128,9 +129,6 @@ def apply_diff_stretch(
     """
     Apply the optimal scale to the diff data
     """
-    measurement.diff_stretch_centers = get_marker_centers(
-        diff_data, measurement.mapping
-    )
 
     if measurement.diff_axis_stretch is None:
         measurement.diff_axis_stretch = find_optimal_diff_scale(
@@ -139,11 +137,11 @@ def apply_diff_stretch(
 
     scale = measurement.diff_axis_stretch
     for frame in diff_data:
-        for key in measurement.diff_stretch_centers.keys():
-            row = frame.rows[key]
-            x_center = measurement.diff_stretch_centers[key][0]
-            y_center = measurement.diff_stretch_centers[key][1]
-            z_center = measurement.diff_stretch_centers[key][2]
+        for key, value in measurement.mapping.items():
+            row = frame.rows[value]
+            x_center = measurement.base_centers[key][0]
+            y_center = measurement.base_centers[key][1]
+            z_center = measurement.base_centers[key][2]
             row.x = (row.x - x_center) * scale[0] + x_center
             row.y = (row.y - y_center) * scale[1] + y_center
             row.z = (row.z - z_center) * scale[2] + z_center

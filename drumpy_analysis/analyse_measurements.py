@@ -1,4 +1,3 @@
-from drumpy_analysis.measurement.frame import Frame, frames_from_csv
 from drumpy_analysis.graphs.deviations_boxplot import deviations_boxplot
 from drumpy_analysis.graphs.trajectory_lineplot import plot_trajectories
 from drumpy_analysis.measurement.deviation import (
@@ -7,6 +6,7 @@ from drumpy_analysis.measurement.deviation import (
     remove_average_offset,
 )
 from drumpy_analysis.measurement.find_optimal_stretch import apply_diff_stretch
+from drumpy_analysis.measurement.frame import Frame, frames_from_csv, get_marker_centers
 from drumpy_analysis.measurement.frame_offset import frame_offsets
 from drumpy_analysis.measurement.measurement import Measurement
 
@@ -36,12 +36,32 @@ def apply_axis_transformations(frames: list[Frame], measurement: Measurement):
             row.z += measurement.diff_axis_offset[2]
 
 
+def calculate_base_center(frames: list[Frame], mapping: dict[int, int]):
+    """
+    Calculate the center of the base recording
+    """
+    centers = {}
+    for key, value in mapping.items():
+        x = 0
+        y = 0
+        z = 0
+        for frame in frames:
+            row = frame.rows[key]
+            x += row.x
+            y += row.y
+            z += row.z
+        centers[key] = (x / len(frames), y / len(frames), z / len(frames))
+    return centers
+
+
 def analyze(measurement: Measurement):
     print(f"\n\n --- Analyzing {measurement.plot_prefix} --- \n")
     base_data = frames_from_csv(measurement.base_recording)
     diff_data = frames_from_csv(measurement.diff_recording, measurement.unit_conversion)
 
     apply_axis_transformations(diff_data, measurement)
+
+    measurement.base_centers = calculate_base_center(base_data, measurement.mapping)
 
     remove_average_offset(
         base_data, diff_data, measurement.mapping, measurement.dominant_fps
@@ -59,7 +79,9 @@ def analyze(measurement: Measurement):
         base_data, diff_data, measurement.mapping, measurement.dominant_fps
     )
 
-    plot_trajectories(base_data, diff_data, measurement, show_plot=False)
+    measurement.diff_centers = get_marker_centers(diff_data, measurement.mapping)
+
+    plot_trajectories(base_data, diff_data, measurement, show_plot=True)
 
     deviations = {}
     compute_deviations_from_measurement(base_data, diff_data, measurement, deviations)
@@ -107,6 +129,14 @@ measurements = [
     ),
     Measurement(
         base_recording="data/asil_01/qtm.csv",
+        diff_recording="data/asil_01/front/FULL.csv",
+        output_prefxix="data/asil_01/front/",
+        mapping=qtm_to_mediapipe,
+        diff_frame_offset=71,
+        plot_prefix="mediapipe_asil_01_front_FULL",
+    ),
+    Measurement(
+        base_recording="data/asil_01/qtm.csv",
         diff_recording="data/asil_01/front/HEAVY.csv",
         output_prefxix="data/asil_01/front/",
         mapping={0: 15},
@@ -125,36 +155,6 @@ measurements = [
     #     plot_prefix="qtm_qtm_offset",
     #     diff_axis_offset=(34.239934, 222.303153, 124.164521),
     #     diff_flip_axis=(False, False, False),
-    # ),
-    # Measurement(
-    #     base_recording="data/asil_01/qtm.csv",
-    #     diff_recording="data/asil_01/front/FULL.csv",
-    #     output_prefxix="data/asil_01/front/",
-    #     mapping={0: 15},
-    #     diff_frame_offset=71,
-    #     plot_prefix="mediapipe_asil_01_front_FULL",
-    # ),
-    # Measurement(
-    #     base_recording="data/asil_01/qtm.csv",
-    #     diff_recording="data/asil_01/front/HEAVY.csv",
-    #     output_prefxix="data/asil_01/front/",
-    #     mapping={0: 15},
-    #     diff_frame_offset=71,
-    #     plot_prefix="mediapipe_asil_01_front_HEAVY",
-    # ),
-    # Measurement(
-    #     base_recording="data/asil_01/qtm.csv",
-    #     diff_recording="data/asil_01/left/HEAVY.csv",
-    #     output_prefxix="data/asil_01/left/",
-    #     mapping={0: 15},
-    #     plot_prefix="mediapipe_asil_01_left_HEAVY",
-    # ),
-    # Measurement(
-    #     base_recording="data/asil_01/qtm.csv",
-    #     diff_recording="data/asil_01/right/HEAVY.csv",
-    #     output_prefxix="data/asil_01/right/",
-    #     mapping={0: 15},
-    #     plot_prefix="mediapipe_asil_01_right_HEAVY",
     # ),
 ]
 

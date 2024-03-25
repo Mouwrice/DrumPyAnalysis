@@ -21,6 +21,12 @@ class Measurement:
     output_prefxix: str
     plot_prefix: str
 
+    # Per marker, the centrum value of the base recording
+    base_centers: dict[int, tuple[float, float, float]] = None
+
+    # Per marker, the centrum value of the comparison recording
+    diff_centers: dict[int, tuple[float, float, float]] = None
+
     # Rotation of the base recording, set to None to find the optimal rotation
     base_axis_rotation: float = None
 
@@ -38,9 +44,6 @@ class Measurement:
 
     # Scale of the comparison recording, stretched or compressed around the center of the values
     diff_axis_stretch: tuple[float, float, float] = None
-
-    # Center of the scale, values that lie on this point are not changed, other values are scaled away from this point
-    diff_stretch_centers: dict[int, tuple[float, float, float]] = None
 
     # Frame offset, used to align the two recordings
     # The recording that was started first should have an offset, the second recording should then have an offset of 0
