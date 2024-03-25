@@ -40,9 +40,9 @@ def track_redcordings():
             app = App(
                 source=Source.FILE,
                 file_path=recording,
-                live_stream=True,
+                live_stream=False,
                 model=model,
-                log_file=f"./data/{directory}/mediapipe_{model.name}.csv",
+                log_file=f"./data/{directory}/{model.name}.csv",
             )
             app.start()
 

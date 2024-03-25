@@ -43,16 +43,15 @@ def compute_deviations_from_measurement(
     measurement: Measurement,
     deviation_lists: dict[int, list[Deviation]] = None,
 ):
+    """
+    Compute the deviations between the base and diff data based on the measurement
+    All transformations are applied
+    """
     compute_devations(
         base_data,
         diff_data,
         measurement.mapping,
         measurement.dominant_fps,
-        measurement.base_frame_offset,
-        measurement.diff_frame_offset,
-        measurement.base_axis_rotation,
-        measurement.diff_axis_stretch,
-        measurement.diff_stretch_centers,
         deviation_lists=deviation_lists,
     )
 

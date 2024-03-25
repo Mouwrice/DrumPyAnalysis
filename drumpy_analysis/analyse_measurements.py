@@ -59,7 +59,7 @@ def analyze(measurement: Measurement):
         base_data, diff_data, measurement.mapping, measurement.dominant_fps
     )
 
-    plot_trajectories(base_data, diff_data, measurement, show_plot=True)
+    plot_trajectories(base_data, diff_data, measurement, show_plot=False)
 
     deviations = {}
     compute_deviations_from_measurement(base_data, diff_data, measurement, deviations)
@@ -93,9 +93,25 @@ measurements = [
         base_recording="data/asil_01/qtm.csv",
         diff_recording="data/asil_01/front/LITE.csv",
         output_prefxix="data/asil_01/front/",
-        mapping={0: 15, 5: 32},
-        # diff_frame_offset=71,
+        mapping={0: 15},
+        diff_frame_offset=71,
         plot_prefix="mediapipe_asil_01_front_LITE",
+    ),
+    Measurement(
+        base_recording="data/asil_01/qtm.csv",
+        diff_recording="data/asil_01/front/FULL.csv",
+        output_prefxix="data/asil_01/front/",
+        mapping={0: 15},
+        diff_frame_offset=71,
+        plot_prefix="mediapipe_asil_01_front_FULL",
+    ),
+    Measurement(
+        base_recording="data/asil_01/qtm.csv",
+        diff_recording="data/asil_01/front/HEAVY.csv",
+        output_prefxix="data/asil_01/front/",
+        mapping={0: 15},
+        diff_frame_offset=71,
+        plot_prefix="mediapipe_asil_01_front_HEAVY",
     ),
     # Measurement(
     #     base_recording="data/asil_01/qtm.csv",
