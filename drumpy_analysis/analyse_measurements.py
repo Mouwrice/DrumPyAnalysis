@@ -3,11 +3,8 @@ from drumpy_analysis.graphs.trajectory_lineplot import plot_trajectories
 from drumpy_analysis.measurement.deviation import (
     compute_deviations_from_measurement,
     write_deviations,
-    remove_average_offset,
 )
-from drumpy_analysis.measurement.find_optimal_stretch import apply_diff_stretch
 from drumpy_analysis.measurement.frame import Frame, frames_from_csv, get_marker_centers
-from drumpy_analysis.measurement.frame_offset import frame_offsets
 from drumpy_analysis.measurement.measurement import Measurement
 
 
@@ -63,21 +60,21 @@ def analyze(measurement: Measurement):
 
     measurement.base_centers = calculate_base_center(base_data, measurement.mapping)
 
-    remove_average_offset(
-        base_data, diff_data, measurement.mapping, measurement.dominant_fps
-    )
-
-    frame_offsets(base_data, diff_data, measurement)
-
-    remove_average_offset(
-        base_data, diff_data, measurement.mapping, measurement.dominant_fps
-    )
-
-    apply_diff_stretch(base_data, diff_data, measurement)
-
-    remove_average_offset(
-        base_data, diff_data, measurement.mapping, measurement.dominant_fps
-    )
+    # remove_average_offset(
+    #     base_data, diff_data, measurement.mapping, measurement.dominant_fps
+    # )
+    #
+    # frame_offsets(base_data, diff_data, measurement)
+    #
+    # remove_average_offset(
+    #     base_data, diff_data, measurement.mapping, measurement.dominant_fps
+    # )
+    #
+    # apply_diff_stretch(base_data, diff_data, measurement)
+    #
+    # remove_average_offset(
+    #     base_data, diff_data, measurement.mapping, measurement.dominant_fps
+    # )
 
     measurement.diff_centers = get_marker_centers(diff_data, measurement.mapping)
 
@@ -111,51 +108,52 @@ qtm_to_mediapipe_compact = {
 }
 
 measurements = [
-    Measurement(
-        base_recording="data/asil_01/qtm.csv",
-        diff_recording="data/asil_01/front/LITE.csv",
-        output_prefxix="data/asil_01/front/",
-        mapping={0: 15},
-        diff_frame_offset=71,
-        plot_prefix="mediapipe_asil_01_front_LITE",
-    ),
-    Measurement(
-        base_recording="data/asil_01/qtm.csv",
-        diff_recording="data/asil_01/front/FULL.csv",
-        output_prefxix="data/asil_01/front/",
-        mapping={0: 15},
-        diff_frame_offset=71,
-        plot_prefix="mediapipe_asil_01_front_FULL",
-    ),
-    Measurement(
-        base_recording="data/asil_01/qtm.csv",
-        diff_recording="data/asil_01/front/FULL.csv",
-        output_prefxix="data/asil_01/front/",
-        mapping=qtm_to_mediapipe,
-        diff_frame_offset=71,
-        plot_prefix="mediapipe_asil_01_front_FULL",
-    ),
-    Measurement(
-        base_recording="data/asil_01/qtm.csv",
-        diff_recording="data/asil_01/front/HEAVY.csv",
-        output_prefxix="data/asil_01/front/",
-        mapping={0: 15},
-        diff_frame_offset=71,
-        plot_prefix="mediapipe_asil_01_front_HEAVY",
-    ),
     # Measurement(
     #     base_recording="data/asil_01/qtm.csv",
-    #     diff_recording="data/asil_01/qtm.csv",
-    #     output_prefxix="data/asil_01/",
-    #     mapping={0: 0},
-    #     diff_frame_offset=0,
-    #     base_axis_rotation=0,
-    #     unit_conversion=1,
-    #     diff_axis_reorder=False,
-    #     plot_prefix="qtm_qtm_offset",
-    #     diff_axis_offset=(34.239934, 222.303153, 124.164521),
-    #     diff_flip_axis=(False, False, False),
+    #     diff_recording="data/asil_01/front/LITE.csv",
+    #     output_prefxix="data/asil_01/front/",
+    #     mapping={0: 15},
+    #     diff_frame_offset=71,
+    #     plot_prefix="mediapipe_asil_01_front_LITE",
     # ),
+    # Measurement(
+    #     base_recording="data/asil_01/qtm.csv",
+    #     diff_recording="data/asil_01/front/FULL.csv",
+    #     output_prefxix="data/asil_01/front/",
+    #     mapping={0: 15},
+    #     diff_frame_offset=71,
+    #     plot_prefix="mediapipe_asil_01_front_FULL",
+    # ),
+    # Measurement(
+    #     base_recording="data/asil_01/qtm.csv",
+    #     diff_recording="data/asil_01/front/FULL.csv",
+    #     output_prefxix="data/asil_01/front/",
+    #     mapping=qtm_to_mediapipe,
+    #     diff_frame_offset=71,
+    #     plot_prefix="mediapipe_asil_01_front_FULL",
+    # ),
+    # Measurement(
+    #     base_recording="data/asil_01/qtm.csv",
+    #     diff_recording="data/asil_01/front/HEAVY.csv",
+    #     output_prefxix="data/asil_01/front/",
+    #     mapping={0: 15},
+    #     diff_frame_offset=71,
+    #     plot_prefix="mediapipe_asil_01_front_HEAVY",
+    # ),
+    Measurement(
+        base_recording="data/asil_01/qtm.csv",
+        diff_recording="data/asil_01/qtm.csv",
+        output_prefxix="data/asil_01/",
+        mapping={0: 0},
+        diff_frame_offset=0,
+        base_axis_rotation=0,
+        unit_conversion=1,
+        diff_axis_reorder=False,
+        plot_prefix="qtm_qtm_offset",
+        diff_axis_stretch=(1, 1, 1),
+        diff_axis_offset=(45.525611, 8.026620, 12.582678),
+        diff_flip_axis=(False, False, False),
+    ),
 ]
 
 if __name__ == "__main__":
