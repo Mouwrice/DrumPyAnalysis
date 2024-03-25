@@ -284,7 +284,7 @@ description = ""
 optional = false
 python-versions = "~3.11"
 files = []
-develop = true
+develop = false
 
 [package.dependencies]
 mediapipe = "0.10.11"
@@ -2005,4 +2005,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.11"
-content-hash = "d87e1cce595b0b16e3cb90a7266a2711ba44e7db97c1f81c274ef1d8f39f82b6"
+content-hash = "d70d80ce9be9f600774d08db5a58f60ee0bb0ecacb243ee62b0ebbe65549ae49"
