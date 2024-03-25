@@ -1,11 +1,11 @@
-from measurement.deviation import remove_average_offset
-from measurement.find_optimal_rotation import (
+from drumpy_analysis.measurement.deviation import remove_average_offset
+from drumpy_analysis.measurement.find_optimal_rotation import (
     apply_base_rotation,
 )
-from measurement.find_optimal_stretch import apply_diff_stretch
+from drumpy_analysis.measurement.find_optimal_stretch import apply_diff_stretch
 
-from measurement.frame import Frame
-from measurement.measurement import Measurement
+from drumpy_analysis.measurement.frame import Frame
+from drumpy_analysis.measurement.measurement import Measurement
 
 
 def apply_scale_rotation(

@@ -4,8 +4,8 @@ from typing import TextIO
 import pandas
 from scipy.spatial.transform import Rotation
 
-from measurement.frame import Frame
-from measurement.measurement import Measurement
+from drumpy_analysis.measurement.frame import Frame
+from drumpy_analysis.measurement.measurement import Measurement
 
 
 @dataclass

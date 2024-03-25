@@ -3,8 +3,8 @@ from enum import Enum
 from bokeh.io import output_file, show, save
 from bokeh.plotting import figure
 
-from measurement.frame import Frame
-from measurement.measurement import Measurement
+from drumpy_analysis.measurement.frame import Frame
+from drumpy_analysis.measurement.measurement import Measurement
 
 
 class Axis(Enum):

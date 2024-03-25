@@ -1,14 +1,14 @@
 from drumpy_analysis.measurement.frame import Frame, frames_from_csv
-from graphs.deviations_boxplot import deviations_boxplot
-from graphs.trajectory_lineplot import plot_trajectories
-from measurement.deviation import (
+from drumpy_analysis.graphs.deviations_boxplot import deviations_boxplot
+from drumpy_analysis.graphs.trajectory_lineplot import plot_trajectories
+from drumpy_analysis.measurement.deviation import (
     compute_deviations_from_measurement,
     write_deviations,
     remove_average_offset,
 )
-from measurement.find_optimal_stretch import apply_diff_stretch
-from measurement.frame_offset import frame_offsets
-from measurement.measurement import Measurement
+from drumpy_analysis.measurement.find_optimal_stretch import apply_diff_stretch
+from drumpy_analysis.measurement.frame_offset import frame_offsets
+from drumpy_analysis.measurement.measurement import Measurement
 
 
 def apply_axis_transformations(frames: list[Frame], measurement: Measurement):

@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 
-from measurement.deviation import Deviation
-from measurement.measurement import Measurement
+from drumpy_analysis.measurement.deviation import Deviation
+from drumpy_analysis.measurement.measurement import Measurement
 
 
 def row_deviation_boxplot(

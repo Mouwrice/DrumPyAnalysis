@@ -2,9 +2,9 @@ import math
 
 from scipy.spatial.transform import Rotation
 
-from measurement.deviation import compute_average_deviation
-from measurement.frame import Frame
-from measurement.measurement import Measurement
+from drumpy_analysis.measurement.deviation import compute_average_deviation
+from drumpy_analysis.measurement.frame import Frame
+from drumpy_analysis.measurement.measurement import Measurement
 
 
 class DeviationFunction:

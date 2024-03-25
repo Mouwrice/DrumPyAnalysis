@@ -1,6 +1,6 @@
-from measurement.deviation import compute_devations
-from measurement.frame import Frame
-from measurement.measurement import Measurement
+from drumpy_analysis.measurement.deviation import compute_devations
+from drumpy_analysis.measurement.frame import Frame
+from drumpy_analysis.measurement.measurement import Measurement
 
 
 def remove_time_offset(frames: list[Frame]):
