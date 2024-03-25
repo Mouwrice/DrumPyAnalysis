@@ -32,24 +32,24 @@ tests-no-zope = ["attrs[tests-mypy]", "cloudpickle", "hypothesis", "pympler", "p
 
 [[package]]
 name = "bokeh"
-version = "3.3.4"
+version = "3.4.0"
 description = "Interactive plots and applications in the browser from Python"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "bokeh-3.3.4-py3-none-any.whl", hash = "sha256:ad7b6f89d0a7c2be01eff1db0ca24e2755ac41de14539db919a62e791809c309"},
-    {file = "bokeh-3.3.4.tar.gz", hash = "sha256:73b7982dc2b8df15bf660cdddc8d3825e829195c438015a5d09824f1a7028368"},
+    {file = "bokeh-3.4.0-py3-none-any.whl", hash = "sha256:d8d9ba026b734317740f90a8a58502d63c76b96c58752fc421ad4aa04df1fbcd"},
+    {file = "bokeh-3.4.0.tar.gz", hash = "sha256:9ea6bc407b5e7d04ba7a2f07d8f00e8b6ffe02c2368e707f41bb362a9928569a"},
 ]
 
 [package.dependencies]
-contourpy = ">=1"
+contourpy = ">=1.2"
 Jinja2 = ">=2.9"
 numpy = ">=1.16"
 packaging = ">=16.8"
 pandas = ">=1.2"
 pillow = ">=7.1.0"
 PyYAML = ">=3.10"
-tornado = ">=5.1"
+tornado = ">=6.2"
 xyzservices = ">=2021.09.1"
 
 [[package]]
@@ -1146,6 +1146,7 @@ description = "Nvidia JIT LTO Library"
 optional = false
 python-versions = ">=3"
 files = [
+    {file = "nvidia_nvjitlink_cu12-12.4.99-py3-none-manylinux2014_aarch64.whl", hash = "sha256:75d6498c96d9adb9435f2bbdbddb479805ddfb97b5c1b32395c694185c20ca57"},
     {file = "nvidia_nvjitlink_cu12-12.4.99-py3-none-manylinux2014_x86_64.whl", hash = "sha256:c6428836d20fe7e327191c175791d38570e10762edc588fb46749217cd444c74"},
     {file = "nvidia_nvjitlink_cu12-12.4.99-py3-none-win_amd64.whl", hash = "sha256:991905ffa2144cb603d8ca7962d75c35334ae82bf92820b6ba78157277da1ad2"},
 ]
@@ -2005,4 +2006,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.11"
-content-hash = "d70d80ce9be9f600774d08db5a58f60ee0bb0ecacb243ee62b0ebbe65549ae49"
+content-hash = "dc80f785388d08ede5cf1fc272cf422540198dcdd67b8d75ebb29716f8620ccd"
