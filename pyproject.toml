@@ -9,7 +9,7 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.dependencies]
-python = "~3.11"
+python = "~3.12.0"
 qtm-rt = "3.0.1"
 bokeh = "3.4.0"
 matplotlib = "3.8.3"
