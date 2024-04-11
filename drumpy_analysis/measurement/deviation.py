@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import TextIO
+from typing import TextIO, Optional, Self
 
 import pandas
 from scipy.spatial.transform import Rotation
@@ -18,7 +18,7 @@ class Deviation:
     deviation_z: float
     euclidean_distance: float
 
-    def add(self, deviation: "Deviation"):
+    def add(self: Self, deviation: "Deviation") -> None:
         self.offset_x += deviation.offset_x
         self.offset_y += deviation.offset_y
         self.offset_z += deviation.offset_z
@@ -27,7 +27,7 @@ class Deviation:
         self.deviation_z += deviation.deviation_z
         self.euclidean_distance += deviation.euclidean_distance
 
-    def divide(self, count: int):
+    def divide(self: Self, count: int) -> None:
         self.offset_x /= count
         self.offset_y /= count
         self.offset_z /= count
@@ -41,8 +41,8 @@ def compute_deviations_from_measurement(
     base_data: list[Frame],
     diff_data: list[Frame],
     measurement: Measurement,
-    deviation_lists: dict[int, list[Deviation]] = None,
-):
+    deviation_lists: Optional[dict[int, list[Deviation]]] = None,
+) -> None:
     """
     Compute the deviations between the base and diff data based on the measurement
     All transformations are applied
@@ -104,7 +104,7 @@ def compute_average_deviation(
     )
 
     average = Deviation(0, 0, 0, 0, 0, 0, 0)
-    for key, value in mapping.items():
+    for key in mapping:
         average.add(deviations[key])
 
     average.divide(len(mapping))
@@ -120,8 +120,8 @@ def compute_devations(
     diff_offset: int = 0,
     base_rotation: float | None = None,
     diff_axis_stretch: tuple[float, float, float] = (1, 1, 1),
-    diff_axis_centers: dict[int, tuple[float, float, float]] = None,
-    deviation_lists: dict[int, list[Deviation]] = None,
+    diff_axis_centers: Optional[dict[int, tuple[float, float, float]]] = None,
+    deviation_lists: Optional[dict[int, list[Deviation]]] = None,
     threshold: float = 0,
 ) -> dict[int, Deviation]:
     """
@@ -134,7 +134,8 @@ def compute_devations(
     :param diff_offset: The time offset for the diff data
     :param base_rotation: The rotation to apply to the base data around the vertical (z) axis, default is 0
     :param diff_axis_stretch: The stretch to apply to the diff data, default is (1, 1, 1), (x, y, z)
-    :param diff_axis_centers: The center of the stretct, values that lie on this point are not changed. Defaults to 0, 0, 0.
+    :param diff_axis_centers: The center of the stretct, values that lie on this point are not changed.
+    Defaults to 0, 0, 0.
     When the stretch is zero, all points converge to this center.
     The center is specified for each marker.
     :param deviation_lists: Pass a dictionary to store the deviations for each individual frame.
@@ -150,7 +151,7 @@ def compute_devations(
     base_frame = base[base_index]
     diff_frame = diff[diff_index]
     deviations = {}
-    for key in mapping.keys():
+    for key in mapping:
         deviations[key] = Deviation(0, 0, 0, 0, 0, 0, 0)
 
     if diff_axis_centers is None:
@@ -240,7 +241,7 @@ def compute_devations(
                     break
                 base_index += 1
 
-    for key, value in mapping.items():
+    for key in mapping:
         deviations[key].divide(count)
 
     return deviations
@@ -251,7 +252,7 @@ def remove_average_offset(
     diff_data: list[Frame],
     mapping: dict[int, int],
     dominant_fps: int,
-):
+) -> None:
     """
     Remove the average offset of the diff data compared to the base data.
     Per axis.
@@ -267,7 +268,7 @@ def remove_average_offset(
 def write_deviations(
     deviation_lists: dict[int, list[Deviation]],
     file: TextIO,
-):
+) -> None:
     file.write("\n\nDeviations:\n")
 
     for key, value in deviation_lists.items():

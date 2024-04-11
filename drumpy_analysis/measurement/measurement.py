@@ -1,5 +1,5 @@
 from dataclasses import dataclass, asdict
-from typing import TextIO
+from typing import TextIO, Self
 
 
 @dataclass
@@ -57,8 +57,8 @@ class Measurement:
     base_label: str = "Qualisys"
     diff_label: str = "Mediapipe"
 
-    def to_string(self):
-        return "\n".join([f"{k}: {str(v)}" for k, v in asdict(self).items()])
+    def __str__(self: Self) -> str:
+        return "\n".join([f"{k}: {v!s}" for k, v in asdict(self).items()])
 
-    def write(self, file: TextIO):
-        file.write(self.to_string())
+    def write(self: Self, file: TextIO) -> None:
+        file.write(str(self))

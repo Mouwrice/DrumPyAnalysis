@@ -1,4 +1,5 @@
 import math
+from typing import Self
 
 from drumpy_analysis.measurement.deviation import compute_average_deviation
 from drumpy_analysis.measurement.frame import Frame
@@ -11,16 +12,16 @@ class DeviationFunction:
     """
 
     def __init__(
-        self,
+        self: Self,
         base_data: list[Frame],
         diff_data: list[Frame],
         measurement: Measurement,
-    ):
+    ) -> None:
         self.base_data = base_data
         self.diff_data = diff_data
         self.measurement = measurement
 
-    def calculate(self, stretch: list[float]) -> tuple[float, float, float]:
+    def calculate(self: Self, stretch: list[float]) -> tuple[float, float, float]:
         """
         Calculate the deviation for the given scale
         """
@@ -71,12 +72,14 @@ def find_optimal_diff_scale(
     print(f"Deviation left_bound: {left_bound_deviation}")
     print(f"Deviation right_bound: {right_bound_deviation}")
 
+    eps = 0.01
+
     iteration = 0
     # Stop when the interval is small enough
     while (
-        right_bound[0] - left_bound[0] > 0.01
-        or right_bound[1] - left_bound[1] > 0.01
-        or right_bound[2] - left_bound[2] > 0.01
+        right_bound[0] - left_bound[0] > eps
+        or right_bound[1] - left_bound[1] > eps
+        or right_bound[2] - left_bound[2] > eps
     ):
         iteration += 1
         print(f"\nOptimizing scale, iteration {iteration}:\n")
@@ -125,7 +128,7 @@ def apply_diff_stretch(
     base_data: list[Frame],
     diff_data: list[Frame],
     measurement: Measurement,
-):
+) -> None:
     """
     Apply the optimal scale to the diff data
     """

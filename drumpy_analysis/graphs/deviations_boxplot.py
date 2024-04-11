@@ -10,7 +10,7 @@ def row_deviation_boxplot(
     base_marker: int,
     diff_marker: int,
     show_plot: bool = False,
-):
+) -> None:
     """
     Plot the absolute sum of deviations of each frame for a certain marker
     as a matploblib boxplot
@@ -69,7 +69,7 @@ def deviations_boxplot(
     deviations: dict[int, list[Deviation]],
     measurement: Measurement,
     show_plot: bool = False,
-):
+) -> None:
     """
     Plot the absolute sum of deviations of each frame for a certain marker
     as a matploblib boxplot

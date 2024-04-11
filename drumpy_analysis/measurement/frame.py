@@ -1,4 +1,5 @@
 import csv
+from typing import Self
 
 from drumpy_analysis.measurement.marker import Marker, parse_row
 
@@ -8,7 +9,7 @@ class Frame:
     A frame consistens of multiple Markers, each Marker is a marker postition at a certain frame
     """
 
-    def __init__(self):
+    def __init__(self: Self) -> None:
         self.rows: list[Marker] = []
         self.time_ms: int = 0
         self.frame: int = 0
@@ -26,8 +27,8 @@ def frames_from_csv(csv_file: str, scale: float = 1.0) -> list[Frame]:
         frame.frame = row.frame
         frame.time_ms = row.time
         frame.rows.append(row)
-        for row in reader:
-            row = parse_row(row, scale=scale)
+        for line in reader:
+            row = parse_row(line, scale=scale)
             if row.frame == frame.frame:
                 frame.rows.append(row)
             else:

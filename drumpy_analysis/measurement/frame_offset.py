@@ -3,7 +3,7 @@ from drumpy_analysis.measurement.frame import Frame
 from drumpy_analysis.measurement.measurement import Measurement
 
 
-def remove_time_offset(frames: list[Frame]):
+def remove_time_offset(frames: list[Frame]) -> None:
     """
     Remove the time offset from the frames
     """
@@ -79,7 +79,7 @@ def frame_offsets(
     base_data: list[Frame],
     diff_data: list[Frame],
     measurement: Measurement,
-):
+) -> None:
     assert (
         measurement.base_frame_offset is not None
         or measurement.diff_frame_offset is not None

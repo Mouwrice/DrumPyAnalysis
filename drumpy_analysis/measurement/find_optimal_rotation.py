@@ -1,4 +1,5 @@
 import math
+from typing import Self
 
 from scipy.spatial.transform import Rotation
 
@@ -13,13 +14,16 @@ class DeviationFunction:
     """
 
     def __init__(
-        self, base_data: list[Frame], diff_data: list[Frame], measurement: Measurement
-    ):
+        self: Self,
+        base_data: list[Frame],
+        diff_data: list[Frame],
+        measurement: Measurement,
+    ) -> None:
         self.base_data = base_data
         self.diff_data = diff_data
         self.measurement = measurement
 
-    def calculate(self, rotation: float) -> tuple[float, float]:
+    def calculate(self: Self, rotation: float) -> tuple[float, float]:
         """
         Calculate the deviation for the given rotation.
         We are only interested in the x and y-axis deviation.
@@ -30,7 +34,7 @@ class DeviationFunction:
             self.measurement.mapping,
             base_rotation=rotation,
             diff_axis_stretch=self.measurement.diff_axis_stretch,
-            diff_axis_centers=self.measurement.diff_stretch_centers,
+            dominant_fps=1,
         )
         return dev.deviation_x, dev.deviation_y
 
@@ -70,9 +74,11 @@ def find_optimal_base_rotation(
     print(f"Deviation left_bound: {left_deviation}")
     print(f"Deviation right_bound: {right_deviation}")
 
+    eps = 0.1
+
     iteration = 0
     # Stop when the interval is small enough
-    while right_bound - left_bound > 0.1:
+    while right_bound - left_bound > eps:
         iteration += 1
         print(f"\nOptimizing rotation, iteration {iteration}:\n")
 
@@ -107,7 +113,7 @@ def find_optimal_base_rotation(
 
 def apply_base_rotation(
     base_data: list[Frame], diff_data: list[Frame], measurement: Measurement
-):
+) -> None:
     """
     Apply the rotation to the base data
     """
@@ -118,6 +124,6 @@ def apply_base_rotation(
 
     rotation = Rotation.from_euler("z", measurement.base_axis_rotation, degrees=True)
     for frame in base_data:
-        for key in measurement.mapping.keys():
+        for key in measurement.mapping:
             row = frame.rows[key]
             row.x, row.y, row.z = rotation.apply([row.x, row.y, row.z])

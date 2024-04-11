@@ -43,7 +43,7 @@ def plot_axis(
     base_label: str,
     diff_label: str,
     show_plot: bool = False,
-):
+) -> None:
     """
     Plot the positions of the markers over time for a certain axis.
     :return:
@@ -76,7 +76,7 @@ def plot_marker_trajectory(
     base_marker: int,
     diff_marker: int,
     show_plot: bool = False,
-):
+) -> None:
     for axis in Axis:
         plot_axis(
             base,
@@ -97,7 +97,7 @@ def plot_trajectories(
     diff: list[Frame],
     measurement: Measurement,
     show_plot: bool = False,
-):
+) -> None:
     """
     Plot the trajectories of the base and diff data
     Plots the x, y and z coordinates of the markers over time using bokeh

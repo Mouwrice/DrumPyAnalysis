@@ -1,10 +1,13 @@
+from typing import Self, Union
+
+
 class Marker:
     """
     Represents a single row of a CSV file
     """
 
     def __init__(
-        self,
+        self: Self,
         frame: int,
         time: int,
         index: int,
@@ -14,7 +17,7 @@ class Marker:
         visibility: float | None,
         presence: float | None,
         normalized: bool,
-    ):
+    ) -> None:
         """Class for storing a row of a CSV file"""
         self.frame: int = frame
         self.time: int = time
@@ -27,7 +30,7 @@ class Marker:
         self.normalized: bool = normalized
 
 
-def parse_row(row, scale: float = 1.0) -> Marker:
+def parse_row(row: Union[dict, str], scale: float = 1.0) -> Marker:
     frame = int(row["frame"])
     time = int(row["time"])
     index = int(row["index"])

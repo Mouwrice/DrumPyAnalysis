@@ -16,11 +16,23 @@ matplotlib = "3.8.4"
 scipy = "^1.12.0"
 drumpy = { path = "./DrumPy", develop = false }
 pandas = "^2.2.1"
+mediapipe = "^0.10.11"
 
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "3.7.0"
 deptry = "0.16.1"
+ruff-lsp = "^0.0.53"
+ruff = "^0.3.5"
+
+[tool.ruff.lint]
+select = [ "E", "F", "N", "ANN", "B", "A", "C4", "PIE", "Q", "RET", "SLF", "SIM", "ARG", "PL", "PERF", "RUF"]
+ignore = ["PLR0912", "PLR0913", "PLR0915"]
+fixable = ["ALL"]
+pylint.max-args = 10
+
+[tool.ruff.lint.pycodestyle]
+max-line-length = 120
 
 [tool.deptry]
 exclude = ["DrumPy", ".venv", "data"]
