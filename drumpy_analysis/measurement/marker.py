@@ -16,7 +16,7 @@ class Marker:
         z: float,
         visibility: float | None,
         presence: float | None,
-        normalized: bool,
+        landmark_type: int,
     ) -> None:
         """Class for storing a row of a CSV file"""
         self.frame: int = frame
@@ -27,7 +27,7 @@ class Marker:
         self.z: float = z
         self.visibility: float | None = visibility
         self.presence: float | None = presence
-        self.normalized: bool = normalized
+        self.landmark_type: int = landmark_type
 
 
 def parse_row(row: Union[dict, str], scale: float = 1.0) -> Marker:
@@ -39,6 +39,6 @@ def parse_row(row: Union[dict, str], scale: float = 1.0) -> Marker:
     z = float(row["z"]) * scale
     visibility = row["visibility"]
     presence = row["presence"]
-    normalized = row["normalized"]
+    landmark_type = row.get("landmark_type", 0)
 
-    return Marker(frame, time, index, x, y, z, visibility, presence, normalized)
+    return Marker(frame, time, index, x, y, z, visibility, presence, landmark_type)

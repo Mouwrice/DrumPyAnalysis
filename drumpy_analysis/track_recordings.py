@@ -1,8 +1,8 @@
 from drumpy.app.main import App
 from drumpy.app.video_source import Source
-from drumpy.tracking.landmarker_model import LandmarkerModel
+from drumpy.mediapipe_pose.landmarker_model import LandmarkerModel
+from drumpy.mediapipe_pose.landmark_type import LandmarkType
 from mediapipe.tasks.python.vision import RunningMode
-from drumpy.tracking.landmark_type import LandmarkType
 
 """
 File to track the recordings
@@ -13,7 +13,7 @@ and output the results to a csv file
 def track_redcordings() -> None:
     recordings = [
         # "../recordings/multicam_asil_01_front_720p.mp4",
-        "../recordings/multicam_asil_01_front_480p.mp4",
+        "../../recordings/multicam_asil_01_front_480p.mp4",
         # "../recordings/multicam_asil_01_front.mkv",
         # "../recordings/multicam_asil_01_left.mkv",
         # "../recordings/multicam_asil_01_right.mkv",
@@ -46,8 +46,8 @@ def track_redcordings() -> None:
                 file_path=recording,
                 running_mode=RunningMode.VIDEO,
                 model=model,
-                log_file=f"./data/{directory}/{model.name}.csv",
-                landmark_type=LandmarkType.WORLD_LANDMARKS,
+                log_file=f"../data/{directory}/{model.name}.csv",
+                landmark_type=LandmarkType.LANDMARKS,
             )
             app.start()
 
