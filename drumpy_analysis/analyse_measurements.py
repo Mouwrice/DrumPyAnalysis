@@ -5,7 +5,7 @@ from drumpy_analysis.measurement.deviation import (
     write_deviations,
     remove_average_offset,
 )
-from drumpy_analysis.measurement.frame import Frame, frames_from_csv, get_marker_centers
+from drumpy_analysis.measurement.frame import Frame, get_marker_centers
 from drumpy_analysis.measurement.measurement import Measurement
 from drumpy_analysis.measurement.find_optimal_stretch import apply_diff_stretch
 from drumpy_analysis.measurement.frame_offset import frame_offsets
@@ -58,8 +58,10 @@ def calculate_base_center(
 
 def analyze(measurement: Measurement) -> None:
     print(f"\n\n --- Analyzing {measurement.plot_prefix} --- \n")
-    base_data = frames_from_csv(measurement.base_recording)
-    diff_data = frames_from_csv(measurement.diff_recording, measurement.unit_conversion)
+    base_data = Frame.frames_from_csv(measurement.base_recording)
+    diff_data = Frame.frames_from_csv(
+        measurement.diff_recording, measurement.unit_conversion
+    )
 
     apply_axis_transformations(diff_data, measurement)
 
