@@ -5,6 +5,7 @@ from bokeh.plotting import figure
 
 from drumpy_analysis.measurement.frame import Frame
 from drumpy_analysis.measurement.measurement import Measurement
+from drumpy.mediapipe_pose.mediapipe_markers import MarkerEnum
 
 
 class Axis(Enum):
@@ -14,7 +15,7 @@ class Axis(Enum):
 
 
 def construct_line(
-    frames: list[Frame], marker: int, axis: Axis
+    frames: list[Frame], marker_enum: MarkerEnum, axis: Axis
 ) -> tuple[list[int], list[float]]:
     """
     Extract a time, position line from the frames
@@ -24,11 +25,11 @@ def construct_line(
         line[0].append(frame.time_ms / 1000)
         match axis:
             case Axis.X:
-                line[1].append(frame.rows[marker].x)
+                line[1].append(frame.markers[marker_enum].x)
             case Axis.Y:
-                line[1].append(frame.rows[marker].y)
+                line[1].append(frame.markers[marker_enum].y)
             case Axis.Z:
-                line[1].append(frame.rows[marker].z)
+                line[1].append(frame.markers[marker_enum].z)
     return line
 
 
@@ -36,10 +37,8 @@ def plot_axis(
     base: list[Frame],
     diff: list[Frame],
     axis: Axis,
-    base_marker: int,
-    diff_marker: int,
+    marker_enum: MarkerEnum,
     file_prefix: str,
-    title_prefix: str,
     base_label: str,
     diff_label: str,
     show_plot: bool = False,
@@ -48,7 +47,7 @@ def plot_axis(
     Plot the positions of the markers over time for a certain axis.
     :return:
     """
-    title = f"{title_prefix}_{base_marker}_{diff_marker}_{axis}_positions"
+    title = f"{marker_enum}_{axis}_positions"
 
     plot = figure(
         title=title,
@@ -57,9 +56,9 @@ def plot_axis(
         sizing_mode="stretch_both",
     )
 
-    line = construct_line(base, base_marker, axis)
+    line = construct_line(base, marker_enum, axis)
     plot.line(line[0], line[1], legend_label=base_label, line_color="red")
-    line = construct_line(diff, diff_marker, axis)
+    line = construct_line(diff, marker_enum, axis)
     plot.line(line[0], line[1], legend_label=diff_label, line_color="blue")
 
     output_file(f"{file_prefix}{title}.html")
@@ -73,8 +72,7 @@ def plot_marker_trajectory(
     base: list[Frame],
     diff: list[Frame],
     measurement: Measurement,
-    base_marker: int,
-    diff_marker: int,
+    marker_enum: MarkerEnum,
     show_plot: bool = False,
 ) -> None:
     for axis in Axis:
@@ -82,10 +80,8 @@ def plot_marker_trajectory(
             base,
             diff,
             axis,
-            base_marker,
-            diff_marker,
+            marker_enum,
             measurement.output_prefxix,
-            measurement.plot_prefix,
             measurement.base_label,
             measurement.diff_label,
             show_plot=show_plot,
@@ -106,5 +102,8 @@ def plot_trajectories(
     :param measurement: The measurement object
     :param show_plot: Opens the plot in the default browser
     """
-    for key, value in measurement.mapping.items():
-        plot_marker_trajectory(base, diff, measurement, key, value, show_plot)
+    for marker_enum in measurement.markers:
+        if marker_enum not in base[0].markers or marker_enum not in diff[0].markers:
+            continue
+
+        plot_marker_trajectory(base, diff, measurement, marker_enum, show_plot)

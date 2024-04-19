@@ -31,7 +31,7 @@ class DeviationFunction:
         dev = compute_average_deviation(
             self.base_data,
             self.diff_data,
-            self.measurement.mapping,
+            self.measurement.markers,
             base_rotation=rotation,
             diff_axis_stretch=self.measurement.diff_axis_stretch,
             dominant_fps=1,
@@ -124,6 +124,6 @@ def apply_base_rotation(
 
     rotation = Rotation.from_euler("z", measurement.base_axis_rotation, degrees=True)
     for frame in base_data:
-        for key in measurement.mapping:
-            row = frame.rows[key]
+        for key in measurement.markers:
+            row = frame.markers[key]
             row.x, row.y, row.z = rotation.apply([row.x, row.y, row.z])

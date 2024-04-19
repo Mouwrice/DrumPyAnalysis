@@ -10,11 +10,10 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.dependencies]
 python = "~3.11"
-qtm-rt = "3.0.1"
-bokeh = "3.4.0"
+bokeh = "3.4.1"
 matplotlib = "3.8.4"
 scipy = "^1.12.0"
-drumpy = { path = "./DrumPy", develop = false }
+drumpy = { path = "./DrumPy", develop = true }
 pandas = "^2.2.1"
 mediapipe = "^0.10.11"
 

@@ -3,12 +3,13 @@ from matplotlib import pyplot as plt
 from drumpy_analysis.measurement.deviation import Deviation
 from drumpy_analysis.measurement.measurement import Measurement
 
+from drumpy.mediapipe_pose.mediapipe_markers import MarkerEnum
+
 
 def row_deviation_boxplot(
     deviations: list[Deviation],
     measurement: Measurement,
-    base_marker: int,
-    diff_marker: int,
+    marker_enum: MarkerEnum,
     show_plot: bool = False,
 ) -> None:
     """
@@ -16,7 +17,7 @@ def row_deviation_boxplot(
     as a matploblib boxplot
     """
 
-    title = f"{measurement.plot_prefix}_{base_marker}_{diff_marker}_deviations_seperate"
+    title = f"{marker_enum}_deviations_seperate"
 
     # Create a list of absolute deviations for each axis
     absolute_deviations = [[], [], []]
@@ -46,7 +47,7 @@ def row_deviation_boxplot(
         plt.show()
 
     # Plot the Euclidean distance of the deviations
-    title = f"{measurement.plot_prefix}_{base_marker}_{diff_marker}_deviations"
+    title = f"{marker_enum}_deviations"
     fig, ax = plt.subplots()
     ax.boxplot(euclidean_deviations, patch_artist=True, vert=True)
     ax.set_title(title)
@@ -74,11 +75,11 @@ def deviations_boxplot(
     Plot the absolute sum of deviations of each frame for a certain marker
     as a matploblib boxplot
     """
-    for base_marker, diff_marker in measurement.mapping.items():
-        row_deviation_boxplot(
-            deviations[diff_marker],
-            measurement,
-            base_marker,
-            diff_marker,
-            show_plot=show_plot,
-        )
+    for marker_enum in measurement.markers:
+        if marker_enum in deviations:
+            row_deviation_boxplot(
+                deviations[marker_enum],
+                measurement,
+                marker_enum,
+                show_plot=show_plot,
+            )
