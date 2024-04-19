@@ -28,12 +28,12 @@ class DeviationFunction:
         dev = compute_average_deviation(
             self.base_data,
             self.diff_data,
-            self.measurement.mapping,
+            self.measurement.markers,
             self.measurement.dominant_fps,
             base_rotation=self.measurement.base_axis_rotation,
             diff_axis_stretch=(stretch[0], stretch[1], stretch[2]),
             diff_axis_centers=self.measurement.base_centers,
-            threshold=0,  # We ignore deviations that are smaller than 10mm
+            threshold=0,
         )
         return dev.deviation_x, dev.deviation_y, dev.deviation_z
 
@@ -140,11 +140,11 @@ def apply_diff_stretch(
 
     scale = measurement.diff_axis_stretch
     for frame in diff_data:
-        for key, value in measurement.mapping.items():
-            row = frame.rows[value]
-            x_center = measurement.base_centers[key][0]
-            y_center = measurement.base_centers[key][1]
-            z_center = measurement.base_centers[key][2]
+        for marker_enum in measurement.markers:
+            row = frame.markers[marker_enum]
+            x_center = measurement.base_centers[marker_enum][0]
+            y_center = measurement.base_centers[marker_enum][1]
+            z_center = measurement.base_centers[marker_enum][2]
             row.x = (row.x - x_center) * scale[0] + x_center
             row.y = (row.y - y_center) * scale[1] + y_center
             row.z = (row.z - z_center) * scale[2] + z_center

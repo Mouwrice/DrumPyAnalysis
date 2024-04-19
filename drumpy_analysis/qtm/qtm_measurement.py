@@ -31,23 +31,21 @@ class QTMFrame:
         """
         Convert the QTMFrame to a Frame object
         """
-        rows: list[Marker] = []
+        markers: dict[MarkerEnum, Marker] = {}
         for marker, position in self.marker_positions.items():
-            rows.append(
-                Marker(
-                    self.frame,
-                    self.time_ms,
-                    marker.value,
-                    position[0],
-                    position[1],
-                    position[2],
-                    None,
-                    None,
-                    0,
-                )
+            markers[marker] = Marker(
+                self.frame,
+                self.time_ms,
+                marker,
+                position[0],
+                position[1],
+                position[2],
+                None,
+                None,
+                0,
             )
 
-        return Frame(rows, self.time_ms, self.frame)
+        return Frame(markers, self.time_ms, self.frame)
 
     @staticmethod
     def from_tsv_row(
@@ -101,6 +99,12 @@ class QTM:
 
     def __str__(self: Self) -> str:
         return f"QTM measurement with {self.no_of_frames} frames at {self.frequency} Hz"
+
+    def to_frames(self: Self) -> list[Frame]:
+        """
+        Convert the QTM object to a list of Frame objects
+        """
+        return [frame.to_frame() for frame in self.frames]
 
     @staticmethod
     def from_tsv(path: str) -> "QTM":

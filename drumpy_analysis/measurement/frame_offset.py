@@ -2,6 +2,8 @@ from drumpy_analysis.measurement.deviation import compute_devations
 from drumpy_analysis.measurement.frame import Frame
 from drumpy_analysis.measurement.measurement import Measurement
 
+from drumpy.mediapipe_pose.mediapipe_markers import MarkerEnum
+
 
 def remove_time_offset(frames: list[Frame]) -> None:
     """
@@ -29,13 +31,13 @@ def find_optimal_base_offset(
         deviations = compute_devations(
             base_data[offset:],
             diff_data,
-            {0: 15},
+            [MarkerEnum.LEFT_WRIST],
             0,
             base_offset=base_data[offset].time_ms,
             diff_offset=diff_data[0].time_ms,
         )
         # The average deviation of the z axis
-        deviation = deviations.get(0).deviation_z
+        deviation = deviations[MarkerEnum.LEFT_WRIST].deviation_z
         if deviation < lowest_deviation:
             lowest_deviation = deviation
             print(f"Base offset: {offset}, Average z-axis deviation: {deviation}")
@@ -60,13 +62,13 @@ def find_optimal_diff_offset(
         deviations = compute_devations(
             base_data,
             diff_data[offset:],
-            {0: 15},
+            [MarkerEnum.LEFT_WRIST],
             1,
             base_offset=base_data[0].time_ms,
             diff_offset=diff_data[offset].time_ms,
         )
         # The average deviation of the z axis
-        deviation = deviations.get(0).deviation_z
+        deviation = deviations[MarkerEnum.LEFT_WRIST].deviation_z
         if deviation < lowest_deviation:
             lowest_deviation = deviation
             print(f"Diff offset: {offset}, Average z-axis deviation: {deviation}")

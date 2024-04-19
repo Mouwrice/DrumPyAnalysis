@@ -1,6 +1,8 @@
 from dataclasses import dataclass, asdict
 from typing import TextIO, Self
 
+from drumpy.mediapipe_pose.mediapipe_markers import MarkerEnum
+
 
 @dataclass
 class Measurement:
@@ -14,18 +16,18 @@ class Measurement:
     # The file path of the comparison recording
     diff_recording: str
 
-    # Marker mapping, used to map the markers from the base recording to the comparison recording
-    mapping: dict[int, int]
+    # The markers that should be compared
+    markers: list[MarkerEnum]
 
     # Path prefix, used to save the measurements in a specific location with a prefix, such as a folder
     output_prefxix: str
     plot_prefix: str
 
     # Per marker, the centrum value of the base recording
-    base_centers: dict[int, tuple[float, float, float]] | None = None
+    base_centers: dict[MarkerEnum, tuple[float, float, float]] | None = None
 
     # Per marker, the centrum value of the comparison recording
-    diff_centers: dict[int, tuple[float, float, float]] | None = None
+    diff_centers: dict[MarkerEnum, tuple[float, float, float]] | None = None
 
     # Rotation of the base recording, set to None to find the optimal rotation
     base_axis_rotation: float | None = None

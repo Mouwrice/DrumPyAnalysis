@@ -7,6 +7,8 @@ from scipy.spatial.transform import Rotation
 from drumpy_analysis.measurement.frame import Frame
 from drumpy_analysis.measurement.measurement import Measurement
 
+from drumpy.mediapipe_pose.mediapipe_markers import MarkerEnum
+
 
 @dataclass
 class Deviation:
@@ -41,7 +43,7 @@ def compute_deviations_from_measurement(
     base_data: list[Frame],
     diff_data: list[Frame],
     measurement: Measurement,
-    deviation_lists: Optional[dict[int, list[Deviation]]] = None,
+    deviation_lists: Optional[dict[MarkerEnum, list[Deviation]]] = None,
 ) -> None:
     """
     Compute the deviations between the base and diff data based on the measurement
@@ -50,7 +52,7 @@ def compute_deviations_from_measurement(
     compute_devations(
         base_data,
         diff_data,
-        measurement.mapping,
+        measurement.markers,
         measurement.dominant_fps,
         deviation_lists=deviation_lists,
     )
@@ -59,13 +61,13 @@ def compute_deviations_from_measurement(
 def compute_average_deviation(
     base: list[Frame],
     diff: list[Frame],
-    mapping: dict[int, int],
+    markers: list[MarkerEnum],
     dominant_fps: int,
     base_offset: int = 0,
     diff_offset: int = 0,
     base_rotation: float = 0,
     diff_axis_stretch: tuple[float, float, float] = (1, 1, 1),
-    diff_axis_centers: dict[int, tuple[float, float, float]] = (0, 0, 0),
+    diff_axis_centers: dict[MarkerEnum, tuple[float, float, float]] = (0, 0, 0),
     threshold: float = 0,
 ) -> Deviation:
     """
@@ -75,7 +77,7 @@ def compute_average_deviation(
     Transformations on the diff data can be specified but are not directly appleid to the data.
     :param base: The base data
     :param diff: The diff data
-    :param mapping: The mapping between the base and diff data
+    :param markers: The markers to compare
     :param base_offset: The time offset for the base data
     :param diff_offset: The time offset for the diff data
     :param base_rotation: The rotation to apply to the base data around the vertical (z) axis, default is 0
@@ -93,7 +95,7 @@ def compute_average_deviation(
     deviations = compute_devations(
         base,
         diff,
-        mapping,
+        markers,
         dominant_fps,
         base_offset,
         diff_offset,
@@ -104,20 +106,20 @@ def compute_average_deviation(
     )
 
     average = Deviation(0, 0, 0, 0, 0, 0, 0)
-    for key in mapping:
+    for key in markers:
         average.add(deviations[key])
 
-    average.divide(len(mapping))
+    average.divide(len(markers))
     return average
 
 
 def compute_devations(
     base: list[Frame],
     diff: list[Frame],
-    mapping: dict[int, int],
+    markers: list[MarkerEnum],
     dominant_fps: int,
-    base_offset: int = 0,
-    diff_offset: int = 0,
+    base_offset: float = 0,
+    diff_offset: float = 0,
     base_rotation: float | None = None,
     diff_axis_stretch: tuple[float, float, float] = (1, 1, 1),
     diff_axis_centers: Optional[dict[int, tuple[float, float, float]]] = None,
@@ -129,7 +131,7 @@ def compute_devations(
     The two data sets can have different lengths and different time stamps
     :param base: The base data
     :param diff: The diff data
-    :param mapping: The mapping between the base and diff data
+    :param markers: The markers to compare
     :param base_offset: The time offset for the base data
     :param diff_offset: The time offset for the diff data
     :param base_rotation: The rotation to apply to the base data around the vertical (z) axis, default is 0
@@ -151,8 +153,8 @@ def compute_devations(
     base_frame = base[base_index]
     diff_frame = diff[diff_index]
     deviations = {}
-    for key in mapping:
-        deviations[key] = Deviation(0, 0, 0, 0, 0, 0, 0)
+    for marker_enum in markers:
+        deviations[marker_enum] = Deviation(0, 0, 0, 0, 0, 0, 0)
 
     if diff_axis_centers is None:
         diff_axis_centers = {}
@@ -164,11 +166,17 @@ def compute_devations(
     while base_index < len(base) - 1 and diff_index < len(diff) - 1:
         count += 1
 
-        for base_marker, diff_marker in mapping.items():
-            if base_marker not in diff_axis_centers:
-                diff_axis_centers[base_marker] = (0, 0, 0)
+        for marker_enum in markers:
+            if (
+                marker_enum not in base_frame.markers
+                or marker_enum not in diff_frame.markers
+            ):
+                continue
 
-            base_row = base_frame.rows[base_marker]
+            if marker_enum not in diff_axis_centers:
+                diff_axis_centers[marker_enum] = (0, 0, 0)
+
+            base_row = base_frame.markers[marker_enum]
             if base_rotation is not None:
                 base_x, base_y, base_z = rotation.apply(
                     [base_row.x, base_row.y, base_row.z]
@@ -178,11 +186,11 @@ def compute_devations(
                 base_y = base_row.y
                 base_z = base_row.z
 
-            diff_row = diff_frame.rows[diff_marker]
+            diff_row = diff_frame.markers[marker_enum]
 
-            center_x = diff_axis_centers[base_marker][0]
-            center_y = diff_axis_centers[base_marker][1]
-            center_z = diff_axis_centers[base_marker][2]
+            center_x = diff_axis_centers[marker_enum][0]
+            center_y = diff_axis_centers[marker_enum][1]
+            center_z = diff_axis_centers[marker_enum][2]
             diff_offset_x = diff_row.x - center_x
             diff_offset_y = diff_row.y - center_y
             diff_offset_z = diff_row.z - center_z
@@ -204,12 +212,12 @@ def compute_devations(
                 x, y, z, abs(x), abs(y), abs(z), (x**2 + y**2 + x**2) ** 0.5
             )
 
-            deviations[base_marker].add(deviation)
+            deviations[marker_enum].add(deviation)
 
             if deviation_lists is not None:
-                if diff_marker not in deviation_lists:
-                    deviation_lists[diff_marker] = []
-                deviation_lists[diff_marker].append(deviation)
+                if marker_enum not in deviation_lists:
+                    deviation_lists[marker_enum] = []
+                deviation_lists[marker_enum].append(deviation)
 
         # The time stamps are not aligned, the next frame is the frame with the closest time stamp
         if dominant_fps == 0:
@@ -241,8 +249,8 @@ def compute_devations(
                     break
                 base_index += 1
 
-    for key in mapping:
-        deviations[key].divide(count)
+    for marker_enum in markers:
+        deviations[marker_enum].divide(count)
 
     return deviations
 
@@ -250,19 +258,19 @@ def compute_devations(
 def remove_average_offset(
     base_data: list[Frame],
     diff_data: list[Frame],
-    mapping: dict[int, int],
+    markers: list[MarkerEnum],
     dominant_fps: int,
 ) -> None:
     """
     Remove the average offset of the diff data compared to the base data.
     Per axis.
     """
-    deviations = compute_devations(base_data, diff_data, mapping, dominant_fps)
-    for key, value in mapping.items():
+    deviations = compute_devations(base_data, diff_data, markers, dominant_fps)
+    for marker_enum in markers:
         for frame in diff_data:
-            frame.rows[value].x += deviations[key].offset_x
-            frame.rows[value].y += deviations[key].offset_y
-            frame.rows[value].z += deviations[key].offset_z
+            frame.markers[marker_enum].x += deviations[marker_enum].offset_x
+            frame.markers[marker_enum].y += deviations[marker_enum].offset_y
+            frame.markers[marker_enum].z += deviations[marker_enum].offset_z
 
 
 def write_deviations(
