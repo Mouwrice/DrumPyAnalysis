@@ -39,6 +39,7 @@ def plot_axis(
     axis: Axis,
     marker_enum: MarkerEnum,
     file_prefix: str,
+    title_prefix: str,
     base_label: str,
     diff_label: str,
     show_plot: bool = False,
@@ -47,7 +48,7 @@ def plot_axis(
     Plot the positions of the markers over time for a certain axis.
     :return:
     """
-    title = f"{marker_enum}_{axis}_positions"
+    title = f"{title_prefix}_{marker_enum}_{axis}_positions"
 
     plot = figure(
         title=title,
@@ -82,6 +83,7 @@ def plot_marker_trajectory(
             axis,
             marker_enum,
             measurement.output_prefxix,
+            measurement.plot_prefix,
             measurement.base_label,
             measurement.diff_label,
             show_plot=show_plot,

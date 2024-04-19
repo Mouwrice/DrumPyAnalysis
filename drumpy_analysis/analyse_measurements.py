@@ -12,7 +12,6 @@ from drumpy_analysis.measurement.frame_offset import frame_offsets
 from drumpy.mediapipe_pose.mediapipe_markers import MarkerEnum
 
 from drumpy_analysis.qtm.qtm_measurement import QTM
-from drumpy_analysis.graphs.trajectory_lineplot import plot_trajectories
 
 
 def apply_axis_transformations(frames: list[Frame], measurement: Measurement) -> None:
@@ -62,7 +61,7 @@ def calculate_base_center(
 
 
 def analyze(measurement: Measurement) -> None:
-    print(f"\n\n --- Analyzing {measurement.diff_recording} --- \n")
+    print(f"\n\n --- Analyzing {measurement.plot_prefix} --- \n")
     base_data = QTM.from_tsv(measurement.base_recording).to_frames()
     diff_data = Frame.frames_from_csv(
         measurement.diff_recording, measurement.unit_conversion
@@ -90,7 +89,7 @@ def analyze(measurement: Measurement) -> None:
 
     measurement.diff_centers = get_marker_centers(diff_data, measurement.markers)
 
-    plot_trajectories(base_data, diff_data, measurement, show_plot=True)
+    # plot_trajectories(base_data, diff_data, measurement, show_plot=True)
 
     deviations = {}
     compute_deviations_from_measurement(base_data, diff_data, measurement, deviations)
@@ -98,7 +97,9 @@ def analyze(measurement: Measurement) -> None:
     deviations_boxplot(deviations, measurement)
 
     # Write the obtained results to a file
-    with open(f"{measurement.output_prefxix}/results.txt", "w") as f:
+    with open(
+        f"{measurement.output_prefxix}{measurement.plot_prefix}_results.txt", "w"
+    ) as f:
         measurement.write(f)
         write_deviations(deviations, f)
 
@@ -112,6 +113,7 @@ measurements = [
         output_prefxix="data/asil_01_front_480p_test/FULL/",
         markers=all_markers,
         # diff_frame_offset=71,
+        plot_prefix="",
     ),
 ]
 
