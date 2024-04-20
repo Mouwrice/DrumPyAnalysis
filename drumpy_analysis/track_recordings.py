@@ -21,14 +21,14 @@ class Recording:
 
 recordings = [
     Recording(
-        recording_path="../data/Recordings/multicam_asil_01_front_480p.mp4",
-        recording_name="asil_01_front_480p_test",
+        recording_path="../data/Recordings/multicam_asil_01_front.mkv",
+        recording_name="asil_01_process_predict_smooth",
     )
 ]
 
 
 def track_recordings() -> None:
-    models = [LandmarkerModel.LITE, LandmarkerModel.FULL, LandmarkerModel.HEAVY]
+    models = [LandmarkerModel.LITE]  # , LandmarkerModel.FULL, LandmarkerModel.HEAVY]
 
     for recording in recordings:
         # Create a directory with the recording name if it does not exist, in the data folder
@@ -46,6 +46,7 @@ def track_recordings() -> None:
                 model=model,
                 log_file=f"../data/{directory}/{model.name}/trajectories.csv",
                 landmark_type=LandmarkType.LANDMARKS,
+                disable_drum=True,
             )
             app.start()
 

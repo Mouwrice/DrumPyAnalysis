@@ -58,7 +58,7 @@ def get_marker_centers(
     return marker_centers
 
 
-def extract_rows(frames: list[Frame], marker_index: int) -> list[Marker]:
+def extract_rows(frames: list[Frame], marker_index: MarkerEnum) -> list[Marker]:
     """
     Extract the rows for a certain marker
     """
