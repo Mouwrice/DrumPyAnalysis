@@ -20,9 +20,9 @@ class QTMFrame:
     ) -> None:
         self.time_ms: float = time_ms
         self.frame: int = frame
-        self.marker_positions: dict[
-            MarkerEnum, tuple[float, float, float]
-        ] = marker_positions
+        self.marker_positions: dict[MarkerEnum, tuple[float, float, float]] = (
+            marker_positions
+        )
 
     def __str__(self: Self) -> str:
         return f"Frame {self.frame} at {self.time_ms} ms: {self.marker_positions}"
