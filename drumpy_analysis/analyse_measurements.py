@@ -107,8 +107,8 @@ all_markers = [MarkerEnum(i) for i in range(1, 21)]
 measurements = [
     Measurement(
         base_recording="data/Qualisys/Data/multicam_asil_01.tsv",
-        diff_recording="data/asil_01_process_predict_smooth/LITE/trajectories.csv",
-        output_prefxix="data/asil_01_process_predict_smooth/LITE/",
+        diff_recording="data/asil_01_process_predict_mollifier/LITE/trajectories.csv",
+        output_prefxix="data/asil_01_process_predict_mollifier/LITE/",
         markers=all_markers,
         # diff_frame_offset=71,
     ),

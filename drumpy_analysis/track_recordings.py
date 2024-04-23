@@ -22,7 +22,7 @@ class Recording:
 recordings = [
     Recording(
         recording_path="../data/Recordings/multicam_asil_01_front.mkv",
-        recording_name="asil_01_process_predict_smooth",
+        recording_name="asil_01_process_predict_mollifier",
     )
 ]
 
