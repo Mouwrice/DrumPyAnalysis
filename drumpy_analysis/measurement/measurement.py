@@ -41,7 +41,7 @@ class Measurement:
     diff_axis_offset: tuple[float, float, float] = (0, 0, 0)
 
     # Whether diff axis should be flipped or not, per axis, e.g. x -> -x
-    diff_flip_axis: tuple[bool, bool, bool] = (True, False, True)
+    diff_flip_axis: tuple[bool, bool, bool] = (False, False, True)
 
     # Scale of the comparison recording, stretched or compressed around the center of the values
     diff_axis_stretch: tuple[float, float, float] | None = None
