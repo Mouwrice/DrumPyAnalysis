@@ -13,8 +13,7 @@ def row_deviation_boxplot(
     show_plot: bool = False,
 ) -> None:
     """
-    Plot the absolute sum of deviations of each frame for a certain marker
-    as a matploblib boxplot
+    Plots the deviations of a certain marker as a matplotlib boxplot
     """
 
     title = f"{marker_enum}_deviations_seperate"
@@ -72,8 +71,7 @@ def deviations_boxplot(
     show_plot: bool = False,
 ) -> None:
     """
-    Plot the absolute sum of deviations of each frame for a certain marker
-    as a matploblib boxplot
+    Plot the deviations of all markers
     """
     for marker_enum in measurement.markers:
         if marker_enum in deviations:

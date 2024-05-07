@@ -5,6 +5,7 @@ from drumpy.app.main import App
 from drumpy.app.video_source import Source
 from drumpy.mediapipe_pose.landmarker_model import LandmarkerModel
 from drumpy.mediapipe_pose.landmark_type import LandmarkType
+from mediapipe.tasks.python import BaseOptions
 from mediapipe.tasks.python.vision import RunningMode
 
 """
@@ -19,16 +20,11 @@ class Recording:
     recording_name: str
 
 
-recordings = [
-    Recording(
-        recording_path="../data/Recordings/multicam_asil_01_front.mkv",
-        recording_name="asil_01_process_predict_mollifier",
-    )
-]
+recordings = []
 
 
 def track_recordings() -> None:
-    models = [LandmarkerModel.LITE]  # , LandmarkerModel.FULL, LandmarkerModel.HEAVY]
+    models = [LandmarkerModel.LITE, LandmarkerModel.FULL, LandmarkerModel.HEAVY]
 
     for recording in recordings:
         # Create a directory with the recording name if it does not exist, in the data folder
@@ -43,6 +39,7 @@ def track_recordings() -> None:
                 source=Source.FILE,
                 file_path=recording.recording_path,
                 running_mode=RunningMode.VIDEO,
+                delegate=BaseOptions.Delegate.GPU,
                 model=model,
                 log_file=f"../data/{directory}/{model.name}/trajectories.csv",
                 landmark_type=LandmarkType.LANDMARKS,

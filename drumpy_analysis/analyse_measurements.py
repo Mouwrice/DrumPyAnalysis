@@ -4,6 +4,7 @@ from drumpy_analysis.measurement.deviation import (
     compute_deviations_from_measurement,
     write_deviations,
     remove_average_offset,
+    write_deviation_derivatives,
 )
 from drumpy_analysis.measurement.frame import Frame, get_marker_centers
 from drumpy_analysis.measurement.measurement import Measurement
@@ -12,6 +13,7 @@ from drumpy_analysis.measurement.frame_offset import frame_offsets
 
 from drumpy.tracking.marker_tracker import MarkerEnum
 from drumpy_analysis.qtm.qtm_measurement import QTM
+from drumpy_analysis.graphs.signal_stability import signal_stability
 
 
 def apply_axis_transformations(frames: list[Frame], measurement: Measurement) -> None:
@@ -94,23 +96,26 @@ def analyze(measurement: Measurement) -> None:
     deviations = {}
     compute_deviations_from_measurement(base_data, diff_data, measurement, deviations)
 
-    deviations_boxplot(deviations, measurement)
+    deviations_boxplot(deviations, measurement, show_plot=False)
+
+    signal_stability(deviations, measurement, show_plot=False)
 
     # Write the obtained results to a file
     with open(f"{measurement.output_prefxix}/results.txt", "w") as f:
         measurement.write(f)
         write_deviations(deviations, f)
+        write_deviation_derivatives(deviations, f)
 
 
-all_markers = [MarkerEnum(i) for i in range(1, 21)]
+all_markers = [MarkerEnum(i) for i in range(1, 32)]
 
 measurements = [
     Measurement(
         base_recording="data/Qualisys/Data/multicam_asil_01.tsv",
-        diff_recording="data/asil_01_process_predict_mollifier/LITE/trajectories.csv",
-        output_prefxix="data/asil_01_process_predict_mollifier/LITE/",
+        diff_recording="data/asil_01_front_480p_processed/FULL/trajectories.csv",
+        output_prefxix="data/asil_01_front_480p_processed/FULL/",
         markers=all_markers,
-        # diff_frame_offset=71,
+        diff_frame_offset=70,
     ),
 ]
 

@@ -274,16 +274,51 @@ def remove_average_offset(
 
 
 def write_deviations(
-    deviation_lists: dict[int, list[Deviation]],
+    deviation_lists: dict[MarkerEnum, list[Deviation]],
     file: TextIO,
 ) -> None:
     file.write("\n\nDeviations:\n")
 
     for key, value in deviation_lists.items():
-        file.write(f"Diff Marker {key}:\n")
+        file.write(f"Marker {key}:\n")
 
         # Convert the list to a pandas dataframe
         df = pandas.DataFrame(value)
+
+        # Write the dataframe to the file
+        file.write(df.describe().to_string())
+
+        file.write("\n\n")
+
+
+def write_deviation_derivatives(
+    deviation_lists: dict[MarkerEnum, list[Deviation]],
+    file: TextIO,
+) -> None:
+    file.write("\n\nSignal Stability:\n")
+
+    for marker_enum, deviations in deviation_lists.items():
+        file.write(f"Marker {marker_enum}:\n")
+
+        # Calculate the first derivative of the deviations
+        deviations_x = []
+        deviations_y = []
+        deviations_z = []
+        for i in range(1, len(deviations)):
+            deviation = deviations[i]
+            previous_deviation = deviations[i - 1]
+            deviations_x.append(
+                abs(deviation.deviation_x - previous_deviation.deviation_x)
+            )
+            deviations_y.append(
+                abs(deviation.deviation_y - previous_deviation.deviation_y)
+            )
+            deviations_z.append(
+                abs(deviation.deviation_z - previous_deviation.deviation_z)
+            )
+
+        # Convert the derivatives to a pandas dataframe
+        df = pandas.DataFrame({"x": deviations_x, "y": deviations_y, "z": deviations_z})
 
         # Write the dataframe to the file
         file.write(df.describe().to_string())
