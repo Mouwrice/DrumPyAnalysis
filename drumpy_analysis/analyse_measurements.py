@@ -110,78 +110,78 @@ def analyze(measurement: Measurement) -> None:
 all_markers = [MarkerEnum(i) for i in range(1, 32)]
 
 measurements = [
-    # Measurement(
-    #     base_recording="data/qualisys/Data/maurice_drum_regular.tsv",
-    #     diff_recording="data/measurements/maurice_drum_regular/LITE/trajectories.csv",
-    #     output_prefxix="data/measurements/maurice_drum_regular/LITE/",
-    #     markers=all_markers,
-    #     base_frame_offset=157,
-    #     diff_frame_offset=0
-    # ),
-    # Measurement(
-    #     base_recording="data/qualisys/Data/maurice_drum_regular.tsv",
-    #     diff_recording="data/measurements/maurice_drum_regular/FULL/trajectories.csv",
-    #     output_prefxix="data/measurements/maurice_drum_regular/FULL/",
-    #     markers=all_markers,
-    #     base_frame_offset=157,
-    #     diff_frame_offset=0
-    # ),
-    # Measurement(
-    #     base_recording="data/qualisys/Data/maurice_drum_regular.tsv",
-    #     diff_recording="data/measurements/maurice_drum_regular/HEAVY/trajectories.csv",
-    #     output_prefxix="data/measurements/maurice_drum_regular/HEAVY/",
-    #     markers=all_markers,
-    #     base_frame_offset=157,
-    #     diff_frame_offset=0
-    # ),
-    # Measurement(
-    #     base_recording="data/qualisys/Data/maurice_drum_fast.tsv",
-    #     diff_recording="data/measurements/maurice_drum_fast/LITE/trajectories.csv",
-    #     output_prefxix="data/measurements/maurice_drum_fast/LITE/",
-    #     markers=all_markers,
-    #     base_frame_offset=216,
-    #     diff_frame_offset=0
-    # ),
-    # Measurement(
-    #     base_recording="data/qualisys/Data/maurice_drum_fast.tsv",
-    #     diff_recording="data/measurements/maurice_drum_fast/FULL/trajectories.csv",
-    #     output_prefxix="data/measurements/maurice_drum_fast/FULL/",
-    #     markers=all_markers,
-    #     base_frame_offset=216,
-    #     diff_frame_offset=0
-    # ),
-    # Measurement(
-    #     base_recording="data/qualisys/Data/maurice_drum_fast.tsv",
-    #     diff_recording="data/measurements/maurice_drum_fast/HEAVY/trajectories.csv",
-    #     output_prefxix="data/measurements/maurice_drum_fast/HEAVY/",
-    #     markers=all_markers,
-    #     base_frame_offset=216,
-    #     diff_frame_offset=0
-    # ),
-    # Measurement(
-    #     base_recording="data/qualisys/Data/maurice_drum_small.tsv",
-    #     diff_recording="data/measurements/maurice_drum_small/LITE/trajectories.csv",
-    #     output_prefxix="data/measurements/maurice_drum_small/LITE/",
-    #     markers=all_markers,
-    #     base_frame_offset=73,
-    #     diff_frame_offset=0
-    # ),
-    # Measurement(
-    #     base_recording="data/qualisys/Data/maurice_drum_small.tsv",
-    #     diff_recording="data/measurements/maurice_drum_small/FULL/trajectories.csv",
-    #     output_prefxix="data/measurements/maurice_drum_small/FULL/",
-    #     markers=all_markers,
-    #     base_frame_offset=73,
-    #     diff_frame_offset=0
-    # ),
-    # Measurement(
-    #     base_recording="data/qualisys/Data/maurice_drum_small.tsv",
-    #     diff_recording="data/measurements/maurice_drum_small/HEAVY/trajectories.csv",
-    #     output_prefxix="data/measurements/maurice_drum_small/HEAVY/",
-    #     markers=all_markers,
-    #     base_frame_offset=73,
-    #     diff_frame_offset=0
-    # ),
+    Measurement(
+        base_recording="data/qualisys/Data/maurice_drum_regular.tsv",
+        diff_recording="data/measurements/maurice_drum_regular/LITE/trajectories.csv",
+        output_prefxix="data/measurements/maurice_drum_regular/LITE/",
+        markers=all_markers,
+        base_frame_offset=157,
+        diff_frame_offset=0,
+    ),
+    Measurement(
+        base_recording="data/qualisys/Data/maurice_drum_regular.tsv",
+        diff_recording="data/measurements/maurice_drum_regular/FULL/trajectories.csv",
+        output_prefxix="data/measurements/maurice_drum_regular/FULL/",
+        markers=all_markers,
+        base_frame_offset=157,
+        diff_frame_offset=0,
+    ),
+    Measurement(
+        base_recording="data/qualisys/Data/maurice_drum_regular.tsv",
+        diff_recording="data/measurements/maurice_drum_regular/HEAVY/trajectories.csv",
+        output_prefxix="data/measurements/maurice_drum_regular/HEAVY/",
+        markers=all_markers,
+        base_frame_offset=157,
+        diff_frame_offset=0,
+    ),
+    Measurement(
+        base_recording="data/qualisys/Data/maurice_drum_fast.tsv",
+        diff_recording="data/measurements/maurice_drum_fast/LITE/trajectories.csv",
+        output_prefxix="data/measurements/maurice_drum_fast/LITE/",
+        markers=all_markers,
+        base_frame_offset=216,
+        diff_frame_offset=0,
+    ),
+    Measurement(
+        base_recording="data/qualisys/Data/maurice_drum_fast.tsv",
+        diff_recording="data/measurements/maurice_drum_fast/FULL/trajectories.csv",
+        output_prefxix="data/measurements/maurice_drum_fast/FULL/",
+        markers=all_markers,
+        base_frame_offset=216,
+        diff_frame_offset=0,
+    ),
+    Measurement(
+        base_recording="data/qualisys/Data/maurice_drum_fast.tsv",
+        diff_recording="data/measurements/maurice_drum_fast/HEAVY/trajectories.csv",
+        output_prefxix="data/measurements/maurice_drum_fast/HEAVY/",
+        markers=all_markers,
+        base_frame_offset=216,
+        diff_frame_offset=0,
+    ),
+    Measurement(
+        base_recording="data/qualisys/Data/maurice_drum_small.tsv",
+        diff_recording="data/measurements/maurice_drum_small/LITE/trajectories.csv",
+        output_prefxix="data/measurements/maurice_drum_small/LITE/",
+        markers=all_markers,
+        base_frame_offset=73,
+        diff_frame_offset=0,
+    ),
+    Measurement(
+        base_recording="data/qualisys/Data/maurice_drum_small.tsv",
+        diff_recording="data/measurements/maurice_drum_small/FULL/trajectories.csv",
+        output_prefxix="data/measurements/maurice_drum_small/FULL/",
+        markers=all_markers,
+        base_frame_offset=73,
+        diff_frame_offset=0,
+    ),
+    Measurement(
+        base_recording="data/qualisys/Data/maurice_drum_small.tsv",
+        diff_recording="data/measurements/maurice_drum_small/HEAVY/trajectories.csv",
+        output_prefxix="data/measurements/maurice_drum_small/HEAVY/",
+        markers=all_markers,
+        base_frame_offset=73,
+        diff_frame_offset=0,
+    ),
 ]
 
 if __name__ == "__main__":

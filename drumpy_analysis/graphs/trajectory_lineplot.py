@@ -1,6 +1,6 @@
 from enum import Enum
 
-from bokeh.io import output_file, show, save
+from bokeh.io import output_file, show, save, export_svg
 from bokeh.plotting import figure
 
 from drumpy_analysis.measurement.frame import Frame
@@ -66,6 +66,9 @@ def plot_axis(
         show(plot)
     else:
         save(plot)
+
+    plot.output_backend = "svg"
+    export_svg(plot, filename=f"{file_prefix}{title}.svg")
 
 
 def plot_marker_trajectory(
