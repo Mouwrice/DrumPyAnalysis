@@ -20,7 +20,24 @@ class Recording:
     recording_name: str
 
 
-recordings = []
+recordings = [
+    Recording(
+        recording_path="../data/recordings/maurice_drum_regular.mov",
+        recording_name="maurice_drum_regular",
+    ),
+    Recording(
+        recording_path="../data/recordings/maurice_drum_fast.mov",
+        recording_name="maurice_drum_fast",
+    ),
+    Recording(
+        recording_path="../data/recordings/maurice_drum_small.mov",
+        recording_name="maurice_drum_small",
+    ),
+    Recording(
+        recording_path="../data/recordings/maurice_drum_swing.mov",
+        recording_name="maurice_drum_swing",
+    ),
+]
 
 
 def track_recordings() -> None:
@@ -29,11 +46,11 @@ def track_recordings() -> None:
     for recording in recordings:
         # Create a directory with the recording name if it does not exist, in the data folder
         directory = recording.recording_name
-        os.makedirs(f"../data/{directory}", exist_ok=True)
+        os.makedirs(f"../data/measurements/{directory}", exist_ok=True)
 
         for model in models:
             # Create a directory with the model name if it does not exist, in the recording directory
-            os.makedirs(f"../data/{directory}/{model.name}", exist_ok=True)
+            os.makedirs(f"../data/measurements/{directory}/{model.name}", exist_ok=True)
 
             app = App(
                 source=Source.FILE,
@@ -41,7 +58,7 @@ def track_recordings() -> None:
                 running_mode=RunningMode.VIDEO,
                 delegate=BaseOptions.Delegate.GPU,
                 model=model,
-                log_file=f"../data/{directory}/{model.name}/trajectories.csv",
+                log_file=f"../data/measurements/{directory}/{model.name}/trajectories.csv",
                 landmark_type=LandmarkType.LANDMARKS,
                 disable_drum=True,
             )

@@ -242,4 +242,5 @@ fabric.properties
 
 .idea/
 
-data/
+data/qualisys
+data/recordings
