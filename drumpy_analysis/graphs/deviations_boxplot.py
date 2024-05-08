@@ -45,6 +45,8 @@ def row_deviation_boxplot(
     if show_plot:
         plt.show()
 
+    plt.close(fig)
+
     # Plot the Euclidean distance of the deviations
     title = f"{marker_enum}_deviations"
     fig, ax = plt.subplots()
@@ -63,6 +65,8 @@ def row_deviation_boxplot(
     plt.savefig(f"{measurement.output_prefxix}{title}.png")
     if show_plot:
         plt.show()
+
+    plt.close(fig)
 
 
 def deviations_boxplot(

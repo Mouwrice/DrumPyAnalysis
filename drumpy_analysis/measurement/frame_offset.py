@@ -18,7 +18,7 @@ def remove_time_offset(frames: list[Frame]) -> None:
 def find_optimal_base_offset(
     base_data: list[Frame],
     diff_data: list[Frame],
-    max_offset: int = 200,
+    max_offset: int = 300,
 ) -> int:
     """
     Find the optimal frame offset between the two data sets by looking at the average deviation of the z axis.

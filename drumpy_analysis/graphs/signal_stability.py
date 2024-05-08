@@ -47,6 +47,8 @@ def marker_signal_stability(
     if show_plot:
         plt.show()
 
+    plt.close(fig)
+
 
 def signal_stability(
     deviations: dict[int, list[Deviation]],
