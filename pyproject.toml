@@ -16,10 +16,7 @@ scipy = "^1.12.0"
 drumpy = { path = "./DrumPy", develop = true }
 pandas = "^2.2.1"
 mediapipe = "^0.10.11"
-selenium = "^4.20.0"
 
-[tool.deptry.per_rule_ignores]
-DEP002 = ["selenium"]
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "3.7.0"
