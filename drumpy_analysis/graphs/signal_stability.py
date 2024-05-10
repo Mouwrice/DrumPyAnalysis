@@ -1,14 +1,14 @@
 from matplotlib import pyplot as plt
 
-from drumpy_analysis.measurement.deviation import Deviation
 from drumpy.mediapipe_pose.mediapipe_markers import MarkerEnum
+from drumpy_analysis.measurement.deviation import Deviation
 from drumpy_analysis.measurement.measurement import Measurement
 
 
 def marker_signal_stability(
     deviations: list[Deviation],
     measurement: Measurement,
-    marker_enum: MarkerEnum,
+    marker_enum: MarkerEnum | None,
     show_plot: bool = False,
 ) -> None:
     """
@@ -16,7 +16,7 @@ def marker_signal_stability(
     for a certain marker
     """
 
-    title = f"{marker_enum}_signal_stability"
+    title = f"{marker_enum if marker_enum is not None else 'total'}_signal_stability"
 
     # Create a list of differences in deviations for each axis
     deviations_x = []
@@ -63,3 +63,10 @@ def signal_stability(
             marker_signal_stability(
                 deviations[marker_enum], measurement, marker_enum, show_plot
             )
+
+    marker_signal_stability(
+        [deviation for deviations in deviations.values() for deviation in deviations],
+        measurement,
+        None,
+        show_plot,
+    )

@@ -4,10 +4,9 @@ from typing import TextIO, Optional, Self
 import pandas
 from scipy.spatial.transform import Rotation
 
+from drumpy.mediapipe_pose.mediapipe_markers import MarkerEnum
 from drumpy_analysis.measurement.frame import Frame
 from drumpy_analysis.measurement.measurement import Measurement
-
-from drumpy.mediapipe_pose.mediapipe_markers import MarkerEnum
 
 
 @dataclass
@@ -279,8 +278,11 @@ def write_deviations(
 ) -> None:
     file.write("\n\nDeviations:\n")
 
+    total_deviations = []
     for key, value in deviation_lists.items():
         file.write(f"Marker {key}:\n")
+
+        total_deviations += value
 
         # Convert the list to a pandas dataframe
         df = pandas.DataFrame(value)
@@ -290,6 +292,12 @@ def write_deviations(
 
         file.write("\n\n")
 
+    # Write the total deviations
+    file.write("Total deviations:\n")
+    df = pandas.DataFrame(total_deviations)
+    file.write(df.describe().to_string())
+    file.write("\n\n")
+
 
 def write_deviation_derivatives(
     deviation_lists: dict[MarkerEnum, list[Deviation]],
@@ -297,6 +305,9 @@ def write_deviation_derivatives(
 ) -> None:
     file.write("\n\nSignal Stability:\n")
 
+    total_deviations_x = []
+    total_deviations_y = []
+    total_deviations_z = []
     for marker_enum, deviations in deviation_lists.items():
         file.write(f"Marker {marker_enum}:\n")
 
@@ -317,6 +328,10 @@ def write_deviation_derivatives(
                 abs(deviation.deviation_z - previous_deviation.deviation_z)
             )
 
+        total_deviations_x += deviations_x
+        total_deviations_y += deviations_y
+        total_deviations_z += deviations_z
+
         # Convert the derivatives to a pandas dataframe
         df = pandas.DataFrame({"x": deviations_x, "y": deviations_y, "z": deviations_z})
 
@@ -324,3 +339,11 @@ def write_deviation_derivatives(
         file.write(df.describe().to_string())
 
         file.write("\n\n")
+
+    # Write the total deviations
+    file.write("Total signal stability:\n")
+    df = pandas.DataFrame(
+        {"x": total_deviations_x, "y": total_deviations_y, "z": total_deviations_z}
+    )
+    file.write(df.describe().to_string())
+    file.write("\n\n")
