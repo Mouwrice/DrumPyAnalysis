@@ -52,7 +52,7 @@ def plot_axis(
     plot = figure(
         title=title,
         x_axis_label="Time (s)",
-        y_axis_label="Position",
+        y_axis_label="Position (mm)",
         sizing_mode="stretch_both",
     )
 

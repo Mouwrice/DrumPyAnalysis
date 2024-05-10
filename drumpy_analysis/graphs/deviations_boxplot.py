@@ -9,14 +9,14 @@ from drumpy.mediapipe_pose.mediapipe_markers import MarkerEnum
 def row_deviation_boxplot(
     deviations: list[Deviation],
     measurement: Measurement,
-    marker_enum: MarkerEnum,
+    marker_enum: MarkerEnum | None,
     show_plot: bool = False,
 ) -> None:
     """
     Plots the deviations of a certain marker as a matplotlib boxplot
     """
 
-    title = f"{marker_enum}_deviations_seperate"
+    title = f"{marker_enum if marker_enum is not None else 'total'}_deviations_seperate"
 
     # Create a list of absolute deviations for each axis
     absolute_deviations = [[], [], []]
@@ -48,7 +48,7 @@ def row_deviation_boxplot(
     plt.close(fig)
 
     # Plot the Euclidean distance of the deviations
-    title = f"{marker_enum}_deviations"
+    title = f"{marker_enum if marker_enum is not None else 'total'}_deviations"
     fig, ax = plt.subplots()
     ax.boxplot(euclidean_deviations, patch_artist=True, vert=True)
     ax.set_title(title)
@@ -85,3 +85,15 @@ def deviations_boxplot(
                 marker_enum,
                 show_plot=show_plot,
             )
+
+    # total deviations
+    row_deviation_boxplot(
+        [
+            deviation
+            for deviations_list in deviations.values()
+            for deviation in deviations_list
+        ],
+        measurement,
+        None,
+        show_plot=show_plot,
+    )
