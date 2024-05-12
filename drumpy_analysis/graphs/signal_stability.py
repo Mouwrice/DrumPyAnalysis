@@ -33,7 +33,7 @@ def marker_signal_stability(
     ax.boxplot([deviations_x, deviations_y, deviations_z], patch_artist=True, vert=True)
 
     ax.set_title(title)
-    ax.set_ylabel("Deviation difference (mm)")
+    ax.set_ylabel("Absolute deviation differences (mm)")
     ax.set_xticklabels(["x", "y", "z"])
 
     # increase the dpi for better quality

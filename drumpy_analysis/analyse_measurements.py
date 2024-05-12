@@ -107,7 +107,7 @@ def analyze(measurement: Measurement) -> None:
         write_deviation_derivatives(deviations, f)
 
 
-all_markers = [MarkerEnum(i) for i in range(1, 32)]
+all_markers = [MarkerEnum(i) for i in range(1, 33)]
 
 measurements = [
     Measurement(

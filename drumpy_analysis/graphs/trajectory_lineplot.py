@@ -47,7 +47,7 @@ def plot_axis(
     Plot the positions of the markers over time for a certain axis.
     :return:
     """
-    title = f"{marker_enum}_{axis}_positions"
+    title = f"{marker_enum}: {axis}"
 
     plot = figure(
         title=title,
