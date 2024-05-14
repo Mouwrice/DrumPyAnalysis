@@ -112,20 +112,28 @@ all_markers = [MarkerEnum(i) for i in range(1, 33)]
 measurements = [
     Measurement(
         base_recording="data/qualisys/Data/maurice_drum_regular.tsv",
-        diff_recording="data/measurements/maurice_drum_regular_720p/FULL/trajectories.csv",
-        output_prefxix="data/measurements/maurice_drum_regular_720p/FULL/",
+        diff_recording="data/measurements/maurice_drum_regular_1080p/FULL/trajectories.csv",
+        output_prefxix="data/measurements/maurice_drum_regular_1080p/FULL/",
         markers=all_markers,
         base_frame_offset=157,
         diff_frame_offset=0,
     ),
-    Measurement(
-        base_recording="data/qualisys/Data/maurice_drum_regular.tsv",
-        diff_recording="data/measurements/maurice_drum_regular_480p/FULL/trajectories.csv",
-        output_prefxix="data/measurements/maurice_drum_regular_480p/FULL/",
-        markers=all_markers,
-        base_frame_offset=157,
-        diff_frame_offset=0,
-    ),
+    # Measurement(
+    #     base_recording="data/qualisys/Data/maurice_drum_regular.tsv",
+    #     diff_recording="data/measurements/maurice_drum_regular_720p/FULL/trajectories.csv",
+    #     output_prefxix="data/measurements/maurice_drum_regular_720p/FULL/",
+    #     markers=all_markers,
+    #     base_frame_offset=157,
+    #     diff_frame_offset=0,
+    # ),
+    # Measurement(
+    #     base_recording="data/qualisys/Data/maurice_drum_regular.tsv",
+    #     diff_recording="data/measurements/maurice_drum_regular_480p/FULL/trajectories.csv",
+    #     output_prefxix="data/measurements/maurice_drum_regular_480p/FULL/",
+    #     markers=all_markers,
+    #     base_frame_offset=157,
+    #     diff_frame_offset=0,
+    # ),
     # Measurement(
     #     base_recording="data/qualisys/Data/maurice_drum_regular.tsv",
     #     diff_recording="data/measurements/maurice_drum_regular/LITE/trajectories.csv",
