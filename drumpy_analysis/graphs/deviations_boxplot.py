@@ -16,7 +16,7 @@ def row_deviation_boxplot(
     Plots the deviations of a certain marker as a matplotlib boxplot
     """
 
-    title = f"{marker_enum if marker_enum is not None else 'total'}_deviations_seperate"
+    title = f"{marker_enum if marker_enum is not None else 'total'}_deviations"
 
     # Create a list of absolute deviations for each axis
     absolute_deviations = [[], [], []]
@@ -37,26 +37,8 @@ def row_deviation_boxplot(
     # increase the dpi for better quality
     fig.set_dpi(300)
 
-    # make the plot bigger
-    fig.set_size_inches(10, 5)
-
-    # Save the plot
-    plt.savefig(f"{measurement.output_prefxix}{title}.png")
-    if show_plot:
-        plt.show()
-
-    plt.close(fig)
-
-    # Plot the Euclidean distance of the deviations
-    title = f"{marker_enum if marker_enum is not None else 'total'}_deviations"
-    fig, ax = plt.subplots()
-    ax.boxplot(euclidean_deviations, patch_artist=True, vert=True)
-    ax.set_title(title)
-    ax.set_ylabel("Deviation (mm)")
-    ax.set_xticklabels(["euclidean distance based"])
-
-    # increase the dpi for better quality
-    fig.set_dpi(300)
+    # set the y-axis limits
+    ax.set_ylim(0, 350)
 
     # make the plot bigger
     fig.set_size_inches(10, 5)

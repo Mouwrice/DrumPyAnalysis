@@ -22,16 +22,12 @@ class Recording:
 
 recordings = [
     Recording(
-        recording_path="../data/recordings/maurice_drum_regular.mov",
-        recording_name="maurice_drum_regular_world",
+        recording_path="../data/recordings/maurice_drum_regular_720p.mkv",
+        recording_name="maurice_drum_regular_720p",
     ),
     Recording(
-        recording_path="../data/recordings/maurice_drum_fast.mov",
-        recording_name="maurice_drum_fast_world",
-    ),
-    Recording(
-        recording_path="../data/recordings/maurice_drum_small.mov",
-        recording_name="maurice_drum_small_world",
+        recording_path="../data/recordings/maurice_drum_regular_480p.mkv",
+        recording_name="maurice_drum_regular_480p",
     ),
 ]
 
