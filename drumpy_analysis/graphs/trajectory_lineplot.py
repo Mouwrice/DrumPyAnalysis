@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Self
 
 from bokeh.io import output_file, show, save, export_svg
 from bokeh.plotting import figure
@@ -12,6 +13,9 @@ class Axis(Enum):
     X = "x"
     Y = "y"
     Z = "z"
+
+    def __str__(self: Self) -> str:
+        return str(self.value)
 
 
 def construct_line(
@@ -47,7 +51,10 @@ def plot_axis(
     Plot the positions of the markers over time for a certain axis.
     :return:
     """
-    title = f"{marker_enum}: {axis}"
+    title = f"{marker_enum}_{axis}"
+
+    # replace whitespace with underscore
+    title = title.replace(" ", "_")
 
     plot = figure(
         title=title,

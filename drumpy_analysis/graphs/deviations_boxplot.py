@@ -18,6 +18,9 @@ def row_deviation_boxplot(
 
     title = f"{marker_enum if marker_enum is not None else 'total'}_deviations"
 
+    # replace whitespace with underscore
+    title = title.replace(" ", "_")
+
     # Create a list of absolute deviations for each axis
     absolute_deviations = [[], [], []]
     euclidean_deviations = []

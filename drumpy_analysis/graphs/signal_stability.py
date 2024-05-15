@@ -18,6 +18,9 @@ def marker_signal_stability(
 
     title = f"{marker_enum if marker_enum is not None else 'total'}_signal_stability"
 
+    # replace whitespace with underscore
+    title = title.replace(" ", "_")
+
     # Create a list of differences in deviations for each axis
     deviations_x = []
     deviations_y = []
