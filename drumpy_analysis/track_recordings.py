@@ -22,8 +22,12 @@ class Recording:
 
 recordings = [
     Recording(
-        recording_path="../data/recordings/maurice_drum_regular_1080p.mkv",
-        recording_name="maurice_drum_regular_1080p",
+        recording_path="../data/recordings/maurice_drum_60fps_trim_01.mp4",
+        recording_name="maurice_drum_60fps_01",
+    ),
+    Recording(
+        recording_path="../data/recordings/maurice_drum_60fps_trim_02.mp4",
+        recording_name="maurice_drum_60fps_02",
     ),
     # Recording(
     #     recording_path="../data/recordings/maurice_drum_regular_480p.mkv",
@@ -33,7 +37,7 @@ recordings = [
 
 
 def track_recordings() -> None:
-    models = [LandmarkerModel.FULL]
+    models = [LandmarkerModel.LITE, LandmarkerModel.FULL, LandmarkerModel.HEAVY]
 
     for recording in recordings:
         # Create a directory with the recording name if it does not exist, in the data folder
@@ -51,7 +55,7 @@ def track_recordings() -> None:
                 delegate=BaseOptions.Delegate.GPU,
                 model=model,
                 log_file=f"../data/measurements/{directory}/{model.name}/trajectories.csv",
-                landmark_type=LandmarkType.WORLD_LANDMARKS,
+                landmark_type=LandmarkType.LANDMARKS,
                 disable_drum=True,
             )
             app.start()
