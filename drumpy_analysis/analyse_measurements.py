@@ -174,6 +174,30 @@ measurements = [
     #     base_frame_offset=216,
     #     diff_frame_offset=0,
     # ),
+    Measurement(
+        base_recording="data/qualisys/Data/maurice_drum_fast.tsv",
+        diff_recording="data/measurements/maurice_drum_fast_processed/LITE/trajectories.csv",
+        output_prefxix="data/measurements/maurice_drum_fast_processed/LITE/",
+        markers=all_markers,
+        base_frame_offset=216,
+        diff_frame_offset=0,
+    ),
+    # Measurement(
+    #     base_recording="data/qualisys/Data/maurice_drum_fast.tsv",
+    #     diff_recording="data/measurements/maurice_drum_fast_processed/FULL/trajectories.csv",
+    #     output_prefxix="data/measurements/maurice_drum_fast_processed/FULL/",
+    #     markers=all_markers,
+    #     base_frame_offset=216,
+    #     diff_frame_offset=0,
+    # ),
+    # Measurement(
+    #     base_recording="data/qualisys/Data/maurice_drum_fast.tsv",
+    #     diff_recording="data/measurements/maurice_drum_fast_processed/HEAVY/trajectories.csv",
+    #     output_prefxix="data/measurements/maurice_drum_fast_processed/HEAVY/",
+    #     markers=all_markers,
+    #     base_frame_offset=216,
+    #     diff_frame_offset=0,
+    # ),
     # Measurement(
     #     base_recording="data/qualisys/Data/maurice_drum_fast.tsv",
     #     diff_recording="data/measurements/maurice_drum_fast/FULL/trajectories.csv",
@@ -314,20 +338,20 @@ measurements = [
     #     markers=all_markers,
     #     diff_frame_offset=125
     # ),
-    Measurement(
-        base_recording="data/qualisys/Data/maurice_drum_60fps_02.tsv",
-        diff_recording="data/measurements/maurice_drum_60fps_02/FULL/trajectories.csv",
-        output_prefxix="data/measurements/maurice_drum_60fps_02/FULL/",
-        markers=all_markers,
-        diff_frame_offset=125,
-    ),
-    Measurement(
-        base_recording="data/qualisys/Data/maurice_drum_60fps_02.tsv",
-        diff_recording="data/measurements/maurice_drum_60fps_02/HEAVY/trajectories.csv",
-        output_prefxix="data/measurements/maurice_drum_60fps_02/HEAVY/",
-        markers=all_markers,
-        diff_frame_offset=125,
-    ),
+    # Measurement(
+    #     base_recording="data/qualisys/Data/maurice_drum_60fps_02.tsv",
+    #     diff_recording="data/measurements/maurice_drum_60fps_02/FULL/trajectories.csv",
+    #     output_prefxix="data/measurements/maurice_drum_60fps_02/FULL/",
+    #     markers=all_markers,
+    #     diff_frame_offset=125,
+    # ),
+    # Measurement(
+    #     base_recording="data/qualisys/Data/maurice_drum_60fps_02.tsv",
+    #     diff_recording="data/measurements/maurice_drum_60fps_02/HEAVY/trajectories.csv",
+    #     output_prefxix="data/measurements/maurice_drum_60fps_02/HEAVY/",
+    #     markers=all_markers,
+    #     diff_frame_offset=125,
+    # ),
 ]
 
 if __name__ == "__main__":

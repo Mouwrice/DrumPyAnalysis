@@ -22,22 +22,14 @@ class Recording:
 
 recordings = [
     Recording(
-        recording_path="../data/recordings/maurice_drum_60fps_trim_01.mp4",
-        recording_name="maurice_drum_60fps_01",
+        recording_path="../data/recordings/maurice_drum_fast.mov",
+        recording_name="maurice_drum_fast_processed",
     ),
-    Recording(
-        recording_path="../data/recordings/maurice_drum_60fps_trim_02.mp4",
-        recording_name="maurice_drum_60fps_02",
-    ),
-    # Recording(
-    #     recording_path="../data/recordings/maurice_drum_regular_480p.mkv",
-    #     recording_name="maurice_drum_regular_480p",
-    # ),
 ]
 
 
 def track_recordings() -> None:
-    models = [LandmarkerModel.LITE, LandmarkerModel.FULL, LandmarkerModel.HEAVY]
+    models = [LandmarkerModel.LITE]  # , LandmarkerModel.FULL, LandmarkerModel.HEAVY]
 
     for recording in recordings:
         # Create a directory with the recording name if it does not exist, in the data folder
