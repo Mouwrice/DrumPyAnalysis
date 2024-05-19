@@ -22,8 +22,8 @@ class Recording:
 
 recordings = [
     Recording(
-        recording_path="../data/recordings/maurice_drum_fast.mov",
-        recording_name="maurice_drum_fast_processed",
+        recording_path="../data/recordings/maurice_drum_60fps_trim_02.mp4",
+        recording_name="maurice_drum_60fps_02_processed_mem4",
     ),
 ]
 

@@ -42,6 +42,9 @@ def marker_signal_stability(
     # increase the dpi for better quality
     fig.set_dpi(300)
 
+    # set the y-axis limits
+    ax.set_ylim(0, 50)
+
     # make the plot bigger
     fig.set_size_inches(10, 5)
 

@@ -174,14 +174,22 @@ measurements = [
     #     base_frame_offset=216,
     #     diff_frame_offset=0,
     # ),
-    Measurement(
-        base_recording="data/qualisys/Data/maurice_drum_fast.tsv",
-        diff_recording="data/measurements/maurice_drum_fast_processed/LITE/trajectories.csv",
-        output_prefxix="data/measurements/maurice_drum_fast_processed/LITE/",
-        markers=all_markers,
-        base_frame_offset=216,
-        diff_frame_offset=0,
-    ),
+    # Measurement(
+    #     base_recording="data/qualisys/Data/maurice_drum_fast.tsv",
+    #     diff_recording="data/measurements/maurice_drum_fast_processed/LITE/trajectories.csv",
+    #     output_prefxix="data/measurements/maurice_drum_fast_processed/LITE/",
+    #     markers=all_markers,
+    #     base_frame_offset=216,
+    #     diff_frame_offset=0,
+    # ),
+    # Measurement(
+    #     base_recording="data/qualisys/Data/maurice_drum_fast.tsv",
+    #     diff_recording="data/measurements/maurice_drum_fast_processed_mem4/LITE/trajectories.csv",
+    #     output_prefxix="data/measurements/maurice_drum_fast_processed_mem4/LITE/",
+    #     markers=all_markers,
+    #     base_frame_offset=216,
+    #     diff_frame_offset=0,
+    # ),
     # Measurement(
     #     base_recording="data/qualisys/Data/maurice_drum_fast.tsv",
     #     diff_recording="data/measurements/maurice_drum_fast_processed/FULL/trajectories.csv",
@@ -352,6 +360,20 @@ measurements = [
     #     markers=all_markers,
     #     diff_frame_offset=125,
     # ),
+    # Measurement(
+    #     base_recording="data/qualisys/Data/maurice_drum_60fps_02.tsv",
+    #     diff_recording="data/measurements/maurice_drum_60fps_02_processed/LITE/trajectories.csv",
+    #     output_prefxix="data/measurements/maurice_drum_60fps_02_processed/LITE/",
+    #     markers=all_markers,
+    #     diff_frame_offset=125,
+    # ),
+    Measurement(
+        base_recording="data/qualisys/Data/maurice_drum_60fps_02.tsv",
+        diff_recording="data/measurements/maurice_drum_60fps_02_processed_mem4/LITE/trajectories.csv",
+        output_prefxix="data/measurements/maurice_drum_60fps_02_processed_mem4/LITE/",
+        markers=all_markers,
+        diff_frame_offset=125,
+    ),
 ]
 
 if __name__ == "__main__":
