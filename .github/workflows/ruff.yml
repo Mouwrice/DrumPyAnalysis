@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v4.1.6
         with:
           submodules: recursive
-      - uses: ITProKyle/action-setup-python@v0.7.0
+      - uses: ITProKyle/action-setup-python@v1.0.0
         with:
           python-version: 3.11
 
