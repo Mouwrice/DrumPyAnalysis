@@ -21,7 +21,7 @@ mediapipe = "0.10.14"
 [tool.poetry.group.dev.dependencies]
 pre-commit = "3.7.1"
 deptry = "0.16.1"
-ruff-lsp = "^0.0.53"
+ruff-lsp = "^0.0.54"
 ruff = "^0.4.0"
 
 [tool.ruff.lint]
